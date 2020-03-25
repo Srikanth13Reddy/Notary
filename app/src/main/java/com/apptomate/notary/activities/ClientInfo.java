@@ -7,6 +7,7 @@ import androidx.appcompat.widget.PopupMenu;
 
 import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.SpannableString;
 import android.util.Log;
@@ -89,7 +90,9 @@ public class ClientInfo extends AppCompatActivity implements SaveView , PopupMen
         tv_assign_.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                Intent i=new Intent(ClientInfo.this,NotariesListActivity.class);
+                startActivity(i);
+                overridePendingTransition(R.anim.right_in, R.anim.left_out);
             }
         });
     }
@@ -205,6 +208,14 @@ public class ClientInfo extends AppCompatActivity implements SaveView , PopupMen
                 lv_documents.setAdapter(documentsAdapter);
                 lv_documents1.setAdapter(typeAdapter);
 
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }else if (code.equalsIgnoreCase("500"))
+        {
+            try {
+                JSONObject js=new JSONObject(response);
+                Toast.makeText(this, ""+js.optString("error"), Toast.LENGTH_SHORT).show();
             } catch (JSONException e) {
                 e.printStackTrace();
             }
