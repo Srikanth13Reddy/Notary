@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="500dp">
+
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:scrollbars="vertical"
+        android:layout_marginBottom="5dp"
+        android:layout_height="300dp">
+
+        <androidx.appcompat.widget.AppCompatEditText
+            android:layout_width="match_parent"
+            android:lineSpacingExtra="2dp"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+            android:layout_margin="12dp"
+            android:padding="10dp"
+            android:hint="Text something......"
+            android:background="@null"
+            android:id="@+id/et_text"
+            android:layout_marginTop="14dp"
+            android:textSize="16dp"
+            android:textColor="@color/colorPrimaryDark"
+            android:layout_height="wrap_content"/>
+    </ScrollView>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_marginTop="14dp"
+        android:id="@+id/ll_acpt"
+        android:orientation="vertical"
+        android:layout_alignParentBottom="true"
+        android:layout_height="70dp">
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btn_acpt"
+            android:text="Pending"
+            android:layout_marginStart="40dp"
+            android:backgroundTint="@color/pending"
+            android:layout_marginEnd="40dp"
+            style="@style/Button_Style"/>
+
+    </LinearLayout>
+
+
+
+
+
+</LinearLayout>
+
+

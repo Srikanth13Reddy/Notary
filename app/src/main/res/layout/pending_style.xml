@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView android:layout_width="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:cardCornerRadius="8dp"
+    android:elevation="5dp"
+    android:layout_margin="10dp"
+    app:cardBackgroundColor="@color/white"
+    android:layout_height="wrap_content"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:orientation="vertical"
+        android:padding="12dp"
+        android:layout_height="wrap_content">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:layout_width="wrap_content"
+            android:text="Mary Helen"
+            android:layout_marginTop="12dp"
+            android:fontFamily="@font/sspbold"
+            android:textSize="20sp"
+            android:id="@+id/name_tv_pending"
+            android:textColor="@color/black"
+            android:layout_height="wrap_content"/>
+        <androidx.appcompat.widget.AppCompatTextView
+            android:layout_width="wrap_content"
+            android:layout_marginTop="12dp"
+            android:textSize="16sp"
+            android:fontFamily="@font/sspregular"
+            android:id="@+id/tv_address_pending"
+            android:text="323 East W Wacker Dr, Chicago, IL 60601, United States"
+            android:textColor="@color/text_color"
+            android:layout_height="wrap_content"/>
+
+<!--        <androidx.appcompat.widget.AppCompatTextView-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_marginTop="12dp"-->
+<!--            android:text="$695 - Rush Full Legalization (7-14 business days)"-->
+<!--            android:textColor="@color/complete"-->
+<!--            android:layout_height="wrap_content"/>-->
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:layout_width="wrap_content"
+            android:layout_marginTop="12dp"
+            android:text="Documents - 04"
+            android:textSize="16sp"
+            android:fontFamily="@font/sspregular"
+            android:id="@+id/tv_documents_pending"
+            android:textColor="@color/black"
+            android:layout_height="wrap_content"/>
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="5dp"
+            android:layout_marginTop="12dp"
+            android:src="@drawable/dotted"
+            android:layerType="software" />
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="wrap_content"
+                android:layout_marginTop="12dp"
+                android:text="1 day ago"
+                android:id="@+id/tv_time_pending"
+                android:layout_centerVertical="true"
+                android:layout_marginBottom="12dp"
+                android:textSize="16sp"
+                android:fontFamily="@font/sspregular"
+                android:textColor="@color/text_color"
+                android:layout_height="wrap_content"/>
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="wrap_content"
+                android:layout_marginTop="12dp"
+                android:text="Pending"
+                android:textSize="16sp"
+                android:fontFamily="@font/sspregular"
+                android:backgroundTint="@color/pending"
+                android:background="@drawable/request_drawable"
+                android:layout_marginBottom="12dp"
+                android:layout_alignParentEnd="true"
+                android:layout_marginStart="12dp"
+                android:layout_marginEnd="12dp"
+                android:paddingStart="12dp"
+                android:paddingTop="5dp"
+                android:paddingBottom="5dp"
+                android:paddingEnd="12dp"
+                android:textColor="@color/white"
+                android:layout_height="wrap_content"/>
+
+        </RelativeLayout>
+
+
+
+    </LinearLayout>
+
+</androidx.cardview.widget.CardView>
+
