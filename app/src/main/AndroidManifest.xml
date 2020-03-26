@@ -11,7 +11,8 @@
         android:roundIcon="@drawable/app_icon"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".activities.NotariesListActivity"></activity>
+        <activity android:name=".activities.AccountActivity"></activity>
+        <activity android:name=".activities.NotariesListActivity" />
         <activity android:name=".activities.ProfileActivity" />
         <activity android:name=".activities.DocumentViewActivity" />
         <activity android:name=".activities.PendingActivity" />

@@ -12,6 +12,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.SearchView;
 import android.widget.Toast;
 
@@ -39,7 +40,7 @@ public class InprogressActivity extends AppCompatActivity implements SaveView
     String id;
     ArrayList<RequestModel> al=new ArrayList<>();
     private SearchView searchView;
-    AppCompatTextView tv_notFound;
+    AppCompatTextView tv_notFound,tv_pro_notfound;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,6 +51,7 @@ public class InprogressActivity extends AppCompatActivity implements SaveView
         progressDialog= ApiConstants.showProgressDialog(this,"Please wait....");
         rv_progress = findViewById(R.id.rv_inprogress);
         tv_notFound = findViewById(R.id.tv_notFound);
+        tv_pro_notfound = findViewById(R.id.tv_pro_notfound);
         rv_progress.setLayoutManager(new LinearLayoutManager(this));
 //        getData();
         getLoginData();
@@ -138,70 +140,34 @@ public class InprogressActivity extends AppCompatActivity implements SaveView
                 if (status_.equalsIgnoreCase("Inprogress"))
                 {
                     String userRequestDetailsId= json.optString("userRequestDetailsId");
-                    String saasUserId= json.optString("saasUserId");
                     String requestedDate= json.optString("requestedDate");
                     String customerId= json.optString("customerId");
-                    String serviceId= json.optString("serviceId");
                     String status= json.optString("status");
-                    String comments= json.optString("comments");
-                    String compeletedDate= json.optString("compeletedDate");
                     String assignedTo= json.optString("assignedTo");
-                    String firstName= json.optString("firstName");
-                    String lastName= json.optString("lastName");
-                    String email= json.optString("email");
-                    String phoneNumber= json.optString("phoneNumber");
-                    String street= json.optString("street");
-                    String apartment= json.optString("apartment");
-                    String city= json.optString("city");
-                    String state= json.optString("state");
-                    String postalcode= json.optString("postalcode");
-                    String country= json.optString("country");
-                    String countryCode= json.optString("countryCode");
-                    String serviceName= json.optString("serviceName");
-                    String price= json.optString("price");
-                    String description= json.optString("description");
-                    String dateFrom= json.optString("dateFrom");
-                    String dateTo= json.optString("dateTo");
-                    String feeDescription= json.optString("feeDescription");
-                    String periodType= json.optString("periodType");
-                    String documents= json.optString("documentsCount");
+                    String documentsCount= json.optString("documentsCount");
                     String name= json.optString("name");
                     String fullAddress= json.optString("fullAddress");
+                    String assignedToName= json.optString("assignedToName");
                     RequestModel requestModel=new RequestModel();
-                    requestModel.setApartment(apartment);
                     requestModel.setName(name);
                     requestModel.setAssignedTo(assignedTo);
-                    requestModel.setCity(city);
-                    requestModel.setFullAddress(fullAddress);
                     requestModel.setUserRequestDetailsId(userRequestDetailsId);
-                    requestModel.setDateFrom(dateFrom);
-                    requestModel.setDocuments(documents);
-                    requestModel.setPeriodType(periodType);
-                    requestModel.setFeeDescription(feeDescription);
-                    requestModel.setDateTo(dateTo);
-                    requestModel.setDescription(description);
-                    requestModel.setPrice(price);
-                    requestModel.setServiceName(serviceName);
-                    requestModel.setCountryCode(countryCode);
-                    requestModel.setCountry(country);
-                    requestModel.setPostalcode(postalcode);
-                    requestModel.setState(state);
-                    requestModel.setSaasUserId(saasUserId);
+                    requestModel.setAssignedToName(assignedToName);
                     requestModel.setCustomerId(customerId);
                     requestModel.setRequestedDate(requestedDate);
-                    requestModel.setStreet(street);
-                    requestModel.setServiceId(serviceId);
-                    requestModel.setComments(comments);
                     requestModel.setStatus(status);
-                    requestModel.setCompeletedDate(compeletedDate);
-                    requestModel.setFirstName(firstName);
-                    requestModel.setLastName(lastName);
-                    requestModel.setEmail(email);
-                    requestModel.setPhoneNumber(phoneNumber);
+                    requestModel.setFullAddress(fullAddress);
+                    requestModel.setDocumentsCount(documentsCount);
                     al.add(requestModel);
                 }
 
 
+            }
+            if (al.size()==0)
+            {
+                tv_pro_notfound.setVisibility(View.VISIBLE);
+            }else {
+                tv_pro_notfound.setVisibility(View.GONE);
             }
             InprogressAdapter requestAdapter=  new InprogressAdapter(this,al,tv_notFound);
             rv_progress.setAdapter(requestAdapter);

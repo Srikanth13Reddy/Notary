@@ -1,0 +1,312 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:orientation="vertical"
+    android:background="@color/white"
+    android:layout_height="match_parent"
+    tools:context=".activities.AccountActivity">
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:padding="12dp"
+        android:id="@+id/rl_pass"
+        android:layout_marginTop="24dp"
+        android:layout_height="wrap_content">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:layout_width="wrap_content"
+            android:text="Change Password"
+            android:textColor="@color/black"
+            android:textSize="20sp"
+            android:fontFamily="@font/sspregular"
+            android:layout_height="wrap_content"/>
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:layout_width="20dp"
+            android:id="@+id/iv_right"
+            android:layout_alignParentEnd="true"
+            android:src="@drawable/right_arrow"
+            android:layout_centerVertical="true"
+            android:visibility="visible"
+            android:layout_height="20dp"/>
+        <androidx.appcompat.widget.AppCompatImageView
+            android:layout_width="24dp"
+            android:visibility="gone"
+            android:id="@+id/iv_down"
+            android:layout_alignParentEnd="true"
+            android:src="@drawable/up_arrow"
+            android:layout_centerVertical="true"
+            android:layout_height="24dp"/>
+
+    </RelativeLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:padding="12dp"
+        android:visibility="gone"
+        android:gravity="center"
+        android:id="@+id/change_pass_ll"
+        android:orientation="vertical"
+        android:layout_height="wrap_content">
+        <androidx.appcompat.widget.AppCompatEditText
+            android:layout_width="match_parent"
+            android:hint="Old Password"
+            android:textColorHint="@color/black"
+            android:inputType="textPassword"
+            android:textColor="@color/black"
+            android:layout_marginEnd="12dp"
+            android:layout_marginStart="12dp"
+            android:padding="12dp"
+            android:fontFamily="@font/sspregular"
+            android:id="@+id/act_old_ps"
+            android:background="@drawable/edittext_drawable"
+            android:layout_height="wrap_content"/>
+        <androidx.appcompat.widget.AppCompatEditText
+            android:layout_width="match_parent"
+            android:hint="New Password"
+            android:layout_marginEnd="12dp"
+            android:layout_marginStart="12dp"
+            android:layout_marginTop="12dp"
+            android:textColorHint="@color/black"
+            android:inputType="textPassword"
+            android:textColor="@color/black"
+            android:padding="12dp"
+            android:fontFamily="@font/sspregular"
+            android:id="@+id/act_new_ps"
+            android:background="@drawable/edittext_drawable"
+            android:layout_height="wrap_content"/>
+        <androidx.appcompat.widget.AppCompatEditText
+            android:layout_width="match_parent"
+            android:hint="Confirm Password"
+            android:layout_marginEnd="12dp"
+            android:layout_marginStart="12dp"
+            android:layout_marginTop="12dp"
+            android:textColorHint="@color/black"
+            android:inputType="textPassword"
+            android:textColor="@color/black"
+            android:padding="12dp"
+            android:fontFamily="@font/sspregular"
+            android:id="@+id/act_confirm_ps"
+            android:background="@drawable/edittext_drawable"
+            android:layout_height="wrap_content"/>
+
+        <Button
+            android:layout_width="150dp"
+            style="@style/Button_Style"
+            android:layout_marginTop="48dp"
+            android:text="Save"
+            android:layout_height="wrap_content"/>
+
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:background="@color/border_color"
+        android:layout_marginStart="16sp"
+        android:layout_marginEnd="16sp"
+        android:layout_marginTop="12dp"
+        android:layout_height="0.5dp"/>
+
+
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:padding="12dp"
+        android:id="@+id/rl_phone"
+        android:layout_marginTop="12dp"
+        android:layout_height="wrap_content">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:layout_width="wrap_content"
+            android:text="Change Phone Number"
+            android:textColor="@color/black"
+            android:textSize="20sp"
+            android:fontFamily="@font/sspregular"
+            android:layout_height="wrap_content"/>
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:layout_width="20dp"
+            android:id="@+id/iv_right_p"
+            android:layout_alignParentEnd="true"
+            android:src="@drawable/right_arrow"
+            android:layout_centerVertical="true"
+            android:visibility="visible"
+            android:layout_height="20dp"/>
+        <androidx.appcompat.widget.AppCompatImageView
+            android:layout_width="24dp"
+            android:visibility="gone"
+            android:id="@+id/iv_down_p"
+            android:layout_alignParentEnd="true"
+            android:src="@drawable/down_arrow"
+            android:layout_centerVertical="true"
+            android:layout_height="24dp"/>
+
+    </RelativeLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:padding="12dp"
+        android:visibility="gone"
+        android:gravity="center"
+        android:id="@+id/change_phone_ll"
+        android:orientation="vertical"
+        android:layout_height="wrap_content">
+        <androidx.appcompat.widget.AppCompatEditText
+            android:layout_width="match_parent"
+            android:hint="Old Password"
+            android:textColorHint="@color/black"
+            android:inputType="textPassword"
+            android:textColor="@color/black"
+            android:layout_marginEnd="12dp"
+            android:layout_marginStart="12dp"
+            android:padding="12dp"
+            android:fontFamily="@font/sspregular"
+            android:background="@drawable/edittext_drawable"
+            android:layout_height="wrap_content"/>
+        <androidx.appcompat.widget.AppCompatEditText
+            android:layout_width="match_parent"
+            android:hint="New Password"
+            android:layout_marginEnd="12dp"
+            android:layout_marginStart="12dp"
+            android:layout_marginTop="12dp"
+            android:textColorHint="@color/black"
+            android:inputType="textPassword"
+            android:textColor="@color/black"
+            android:padding="12dp"
+            android:fontFamily="@font/sspregular"
+            android:background="@drawable/edittext_drawable"
+            android:layout_height="wrap_content"/>
+        <androidx.appcompat.widget.AppCompatEditText
+            android:layout_width="match_parent"
+            android:hint="Confirm Password"
+            android:layout_marginEnd="12dp"
+            android:layout_marginStart="12dp"
+            android:layout_marginTop="12dp"
+            android:textColorHint="@color/black"
+            android:inputType="textPassword"
+            android:textColor="@color/black"
+            android:padding="12dp"
+            android:fontFamily="@font/sspregular"
+            android:background="@drawable/edittext_drawable"
+            android:layout_height="wrap_content"/>
+
+        <Button
+            android:layout_width="150dp"
+            style="@style/Button_Style"
+            android:layout_marginTop="48dp"
+            android:text="Save"
+            android:layout_height="wrap_content"/>
+
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:background="@color/border_color"
+        android:layout_marginStart="16sp"
+        android:layout_marginEnd="16sp"
+        android:layout_marginTop="12dp"
+        android:layout_height="0.5dp"/>
+
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:padding="12dp"
+        android:id="@+id/rl_address"
+        android:layout_marginTop="12dp"
+        android:layout_height="wrap_content">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:layout_width="wrap_content"
+            android:text="Change Address"
+            android:textColor="@color/black"
+            android:textSize="20sp"
+            android:fontFamily="@font/sspregular"
+            android:layout_height="wrap_content"/>
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:layout_width="20dp"
+            android:id="@+id/iv_right_ad"
+            android:layout_alignParentEnd="true"
+            android:src="@drawable/right_arrow"
+            android:layout_centerVertical="true"
+            android:visibility="visible"
+            android:layout_height="20dp"/>
+        <androidx.appcompat.widget.AppCompatImageView
+            android:layout_width="24dp"
+            android:visibility="gone"
+            android:id="@+id/iv_down_ad"
+            android:layout_alignParentEnd="true"
+            android:src="@drawable/down_arrow"
+            android:layout_centerVertical="true"
+            android:layout_height="24dp"/>
+
+    </RelativeLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:padding="12dp"
+        android:visibility="gone"
+        android:gravity="center"
+        android:id="@+id/change_address_ll"
+        android:orientation="vertical"
+        android:layout_height="wrap_content">
+        <androidx.appcompat.widget.AppCompatEditText
+            android:layout_width="match_parent"
+            android:hint="Old Password"
+            android:textColorHint="@color/black"
+            android:inputType="textPassword"
+            android:textColor="@color/black"
+            android:layout_marginEnd="12dp"
+            android:layout_marginStart="12dp"
+            android:padding="12dp"
+            android:fontFamily="@font/sspregular"
+            android:background="@drawable/edittext_drawable"
+            android:layout_height="wrap_content"/>
+        <androidx.appcompat.widget.AppCompatEditText
+            android:layout_width="match_parent"
+            android:hint="New Password"
+            android:layout_marginEnd="12dp"
+            android:layout_marginStart="12dp"
+            android:layout_marginTop="12dp"
+            android:textColorHint="@color/black"
+            android:inputType="textPassword"
+            android:textColor="@color/black"
+            android:padding="12dp"
+            android:fontFamily="@font/sspregular"
+            android:background="@drawable/edittext_drawable"
+            android:layout_height="wrap_content"/>
+        <androidx.appcompat.widget.AppCompatEditText
+            android:layout_width="match_parent"
+            android:hint="Confirm Password"
+            android:layout_marginEnd="12dp"
+            android:layout_marginStart="12dp"
+            android:layout_marginTop="12dp"
+            android:textColorHint="@color/black"
+            android:inputType="textPassword"
+            android:textColor="@color/black"
+            android:padding="12dp"
+            android:fontFamily="@font/sspregular"
+            android:background="@drawable/edittext_drawable"
+            android:layout_height="wrap_content"/>
+
+        <Button
+            android:layout_width="150dp"
+            style="@style/Button_Style"
+            android:layout_marginTop="48dp"
+            android:text="Save"
+            android:layout_height="wrap_content"/>
+
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:background="@color/border_color"
+        android:layout_marginStart="16sp"
+        android:layout_marginEnd="16sp"
+        android:layout_marginTop="12dp"
+        android:layout_height="0.5dp"/>
+
+
+</LinearLayout>

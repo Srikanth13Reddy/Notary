@@ -41,8 +41,8 @@ public class DocumentViewActivity extends AppCompatActivity {
         webSettings.setJavaScriptEnabled(true);
         webSettings.setLoadWithOverviewMode(true);
         webSettings.setUseWideViewPort(true);
-        webSettings.setSupportZoom(true);
-        //webSettings.setBuiltInZoomControls(true);
+        //webSettings.setSupportZoom(true);
+        webSettings.setBuiltInZoomControls(true);
 
         webView.setWebViewClient(new WebViewClient() {
             public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {

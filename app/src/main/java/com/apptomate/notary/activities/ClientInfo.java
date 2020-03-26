@@ -13,10 +13,12 @@ import android.text.SpannableString;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -44,6 +46,7 @@ import org.json.JSONObject;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 
+import de.hdodenhof.circleimageview.CircleImageView;
 import io.github.douglasjunior.androidSimpleTooltip.SimpleTooltip;
 
 public class ClientInfo extends AppCompatActivity implements SaveView , PopupMenu.OnMenuItemClickListener
@@ -56,6 +59,7 @@ public class ClientInfo extends AppCompatActivity implements SaveView , PopupMen
     SharedPrefs sharedPrefs;
     AppCompatTextView tv_client_name,tv_client_shipping_address,tv_service,tv_assign_;
     private String userRequestDetailsId;
+    ImageView edit_iv_status;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,7 +68,7 @@ public class ClientInfo extends AppCompatActivity implements SaveView , PopupMen
         getSupportActionBar().setTitle("Client Info");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         progressDialog= ApiConstants.showProgressDialog(this,"Please wait....");
-        findViews();
+
         getLoginData();
         Bundle b= getIntent().getExtras();
         if (b != null) {
@@ -73,6 +77,25 @@ public class ClientInfo extends AppCompatActivity implements SaveView , PopupMen
             getRequestData();
         }
 
+        findViews();
+
+        visibleViews();
+
+
+
+        tv_assign_.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i=new Intent(ClientInfo.this,NotariesListActivity.class);
+                i.putExtra("rId",rId);
+                startActivity(i);
+                overridePendingTransition(R.anim.right_in, R.anim.left_out);
+            }
+        });
+    }
+
+    private void visibleViews()
+    {
         if (roleId.equalsIgnoreCase("1")&&status.equalsIgnoreCase("New"))
         {
             tv_assign_.setVisibility(View.VISIBLE);
@@ -87,15 +110,13 @@ public class ClientInfo extends AppCompatActivity implements SaveView , PopupMen
             tv_assign_.setVisibility(View.GONE);
         }
 
-        tv_assign_.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent i=new Intent(ClientInfo.this,NotariesListActivity.class);
-                i.putExtra("rId",rId);
-                startActivity(i);
-                overridePendingTransition(R.anim.right_in, R.anim.left_out);
-            }
-        });
+        if (status.equalsIgnoreCase("Completed")||status.equalsIgnoreCase("Rejected"))
+        {
+            edit_iv_status.setVisibility(View.GONE);
+        }
+        else {
+            edit_iv_status.setVisibility(View.VISIBLE);
+        }
     }
 
     private void getLoginData()
@@ -118,6 +139,7 @@ public class ClientInfo extends AppCompatActivity implements SaveView , PopupMen
     private void findViews()
     {
         lv_documents= findViewById(R.id.lv_documents);
+        edit_iv_status= findViewById(R.id.edit_iv_status);
         lv_documents1= findViewById(R.id.lv_documents1);
         tv_assign_= findViewById(R.id.tv_assign_);
         tv_client_name= findViewById(R.id.tv_client_name);
@@ -125,12 +147,16 @@ public class ClientInfo extends AppCompatActivity implements SaveView , PopupMen
        // tv_service= findViewById(R.id.tv_service);
        // lv_documents.setAdapter(new DocumentsAdapter(this));
 
+
+
+
+
     }
 
     public void getRequestData()
     {
         progressDialog.show();
-        new SaveImpl(this).handleSave(new JSONObject(),"requestbyid/"+rId,"GET","");
+        new SaveImpl(this).handleSave(new JSONObject(),"requestbyid?requestDetailsId="+rId,"GET","");
     }
 
     @Override
@@ -238,6 +264,32 @@ public class ClientInfo extends AppCompatActivity implements SaveView , PopupMen
         MenuInflater inflater = popup.getMenuInflater();
         popup.setOnMenuItemClickListener(ClientInfo.this);
         inflater.inflate(R.menu.edit_style, popup.getMenu());
+        Menu popupmenu= popup.getMenu();
+        MenuItem rejected= popupmenu.findItem(R.id.rejected);
+        MenuItem complete= popupmenu.findItem(R.id.complete);
+        MenuItem progress= popupmenu.findItem(R.id.progress);
+        MenuItem pending= popupmenu.findItem(R.id.pending);
+       if (status.equalsIgnoreCase("New"))
+       {
+          rejected.setVisible(true);
+           complete.setVisible(true);
+           progress.setVisible(true);
+           pending.setVisible(true);
+       }
+       else if (status.equalsIgnoreCase("Inprogress"))
+       {
+           rejected.setVisible(true);
+           complete.setVisible(true);
+           progress.setVisible(false);
+           pending.setVisible(true);
+       }
+       else if (status.equalsIgnoreCase("Pending"))
+       {
+           rejected.setVisible(true);
+           complete.setVisible(true);
+           progress.setVisible(true);
+           pending.setVisible(false);
+       }
         popup.show();
 
 //        String[] names={"Reject","Pending","InProgress","Complete"};

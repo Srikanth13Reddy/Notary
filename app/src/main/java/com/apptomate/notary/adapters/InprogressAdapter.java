@@ -53,19 +53,16 @@ public class InprogressAdapter extends RecyclerView.Adapter<InprogressAdapter.My
         if (imageModelArrayList.get(position)!=null)
         {
             RequestModel obj=imageModelArrayList.get(position);
-            holder.tv_documents_process.setText("Documents - "+obj.getDocuments());
+            holder.tv_documents_process.setText("Documents - "+obj.getDocumentsCount());
             holder.tv_address_process.setText(obj.getFullAddress());
             holder.name_tv_process.setText(obj.getName());
-            holder.itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v)
-                {
-                    Intent i=new Intent(context, ClientInfo.class);
-                    i.putExtra("rId",obj.getUserRequestDetailsId());
-                    context.startActivity(i);
-                    Activity mContext = (Activity) context;
-                    mContext.overridePendingTransition(R.anim.right_in, R.anim.left_out);
-                }
+            holder.tv_notary_name.setText(obj.getAssignedToName());
+            holder.itemView.setOnClickListener(v -> {
+                Intent i=new Intent(context, ClientInfo.class);
+                i.putExtra("rId",obj.getUserRequestDetailsId());
+                context.startActivity(i);
+                Activity mContext = (Activity) context;
+                mContext.overridePendingTransition(R.anim.right_in, R.anim.left_out);
             });
         }
     }
@@ -99,7 +96,7 @@ public class InprogressAdapter extends RecyclerView.Adapter<InprogressAdapter.My
 
     public class MyHolder extends RecyclerView.ViewHolder
     {
-        AppCompatTextView tv_time_process,name_tv_process,tv_address_process,tv_documents_process;
+        AppCompatTextView tv_time_process,name_tv_process,tv_address_process,tv_documents_process,tv_notary_name;
 
         public MyHolder(@NonNull View v) {
             super(v);
@@ -107,6 +104,7 @@ public class InprogressAdapter extends RecyclerView.Adapter<InprogressAdapter.My
             name_tv_process= v.findViewById(R.id.name_tv_process);
             tv_address_process= v.findViewById(R.id.tv_address_process);
             tv_documents_process= v.findViewById(R.id.tv_documents_process);
+            tv_notary_name= v.findViewById(R.id.tv_notary_name);
         }
     }
 }

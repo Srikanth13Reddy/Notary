@@ -59,19 +59,17 @@ public class CompleteAdapter extends RecyclerView.Adapter<CompleteAdapter.MyHold
         if (imageModelArrayList.get(position)!=null)
         {
             RequestModel obj=imageModelArrayList.get(position);
-            holder.tv_documents_com.setText("Documents - "+obj.getDocuments());
+            holder.tv_documents_com.setText("Documents - "+obj.getDocumentsCount());
             holder.tv_address_com.setText(obj.getFullAddress());
             holder.name_tv_com.setText(obj.getName());
-            holder.itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v)
-                {
-                    Intent i=new Intent(context, ClientInfo.class);
-                    i.putExtra("rId",obj.getUserRequestDetailsId());
-                    context.startActivity(i);
-                    Activity mContext = (Activity) context;
-                    mContext.overridePendingTransition(R.anim.right_in, R.anim.left_out);
-                }
+            holder.tv_notary_name.setText(obj.getAssignedToName());
+            holder.itemView.setOnClickListener(v -> {
+                Intent i=new Intent(context, ClientInfo.class);
+                i.putExtra("rId",obj.getUserRequestDetailsId());
+                i.putExtra("status",obj.getStatus());
+                context.startActivity(i);
+                Activity mContext = (Activity) context;
+                mContext.overridePendingTransition(R.anim.right_in, R.anim.left_out);
             });
         }
 
@@ -106,7 +104,7 @@ public class CompleteAdapter extends RecyclerView.Adapter<CompleteAdapter.MyHold
 
     public class MyHolder extends RecyclerView.ViewHolder
     {
-        AppCompatTextView name_tv_com,tv_address_com,tv_documents_com,tv_time_rqst;
+        AppCompatTextView name_tv_com,tv_address_com,tv_documents_com,tv_time_rqst,tv_notary_name;
 
         public MyHolder(@NonNull View v) {
             super(v);
@@ -114,6 +112,7 @@ public class CompleteAdapter extends RecyclerView.Adapter<CompleteAdapter.MyHold
             tv_address_com= v.findViewById(R.id.tv_address_com);
             tv_documents_com= v.findViewById(R.id.tv_documents_com);
             tv_time_rqst= v.findViewById(R.id.tv_time_rqst);
+            tv_notary_name= v.findViewById(R.id.tv_notary_name);
 
         }
     }

@@ -56,9 +56,10 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.MyHolder
          RequestModel obj= imageModelArrayList.get(position);
          if (obj!=null)
          {
-             holder.tv_documents_rqst.setText("Documents - "+obj.getDocuments());
+             holder.tv_documents_rqst.setText("Documents - "+obj.getDocumentsCount());
              holder.tv_address_rqst.setText(obj.getFullAddress());
              holder.name_tv_rqst.setText(obj.getName());
+             holder.tv_notary_name.setText(obj.getAssignedToName());
              if (obj.getStatus().equalsIgnoreCase("New"))
              {
                  holder.tv_status_rqst.setBackgroundResource(R.drawable.request_drawable);
@@ -132,7 +133,7 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.MyHolder
 
     public class MyHolder extends RecyclerView.ViewHolder
     {
-        AppCompatTextView name_tv_rqst,tv_address_rqst,tv_bus_rqst,tv_documents_rqst,tv_time_rqst,tv_status_rqst;
+        AppCompatTextView name_tv_rqst,tv_address_rqst,tv_bus_rqst,tv_documents_rqst,tv_time_rqst,tv_status_rqst,tv_notary_name;
 
         public MyHolder(@NonNull View v) {
             super(v);
@@ -143,6 +144,7 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.MyHolder
             tv_documents_rqst= v.findViewById(R.id.tv_documents_rqst);
             tv_time_rqst= v.findViewById(R.id.tv_time_rqst);
             tv_status_rqst= v.findViewById(R.id.tv_status_rqst);
+            tv_notary_name= v.findViewById(R.id.tv_notary_name);
         }
     }
 }

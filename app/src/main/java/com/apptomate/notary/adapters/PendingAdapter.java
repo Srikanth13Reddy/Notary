@@ -53,19 +53,16 @@ public class PendingAdapter extends RecyclerView.Adapter<PendingAdapter.MyHolder
         if (imageModelArrayList.get(position)!=null)
         {
             RequestModel obj=imageModelArrayList.get(position);
-            holder.tv_documents_pending.setText("Documents - "+obj.getDocuments());
+            holder.tv_documents_pending.setText("Documents - "+obj.getDocumentsCount());
             holder.tv_address_pending.setText(obj.getFullAddress());
             holder.name_tv_pending.setText(obj.getName());
-            holder.itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v)
-                {
-                    Intent i=new Intent(context, ClientInfo.class);
-                    i.putExtra("rId",obj.getUserRequestDetailsId());
-                    context.startActivity(i);
-                    Activity mContext = (Activity) context;
-                    mContext.overridePendingTransition(R.anim.right_in, R.anim.left_out);
-                }
+            holder.tv_notary_name.setText(obj.getAssignedToName());
+            holder.itemView.setOnClickListener(v -> {
+                Intent i=new Intent(context, ClientInfo.class);
+                i.putExtra("rId",obj.getUserRequestDetailsId());
+                context.startActivity(i);
+                Activity mContext = (Activity) context;
+                mContext.overridePendingTransition(R.anim.right_in, R.anim.left_out);
             });
         }
     }
@@ -99,7 +96,7 @@ public class PendingAdapter extends RecyclerView.Adapter<PendingAdapter.MyHolder
 
     public class MyHolder extends RecyclerView.ViewHolder
     {
-        AppCompatTextView name_tv_pending,tv_address_pending,tv_documents_pending,tv_time_pending;
+        AppCompatTextView name_tv_pending,tv_address_pending,tv_documents_pending,tv_time_pending,tv_notary_name;
 
         public MyHolder(@NonNull View itemView) {
             super(itemView);
@@ -107,6 +104,7 @@ public class PendingAdapter extends RecyclerView.Adapter<PendingAdapter.MyHolder
             tv_address_pending= itemView.findViewById(R.id.tv_address_pending);
             tv_documents_pending= itemView.findViewById(R.id.tv_documents_pending);
             tv_time_pending= itemView.findViewById(R.id.tv_time_pending);
+            tv_notary_name= itemView.findViewById(R.id.tv_notary_name);
         }
     }
 }

@@ -7,7 +7,9 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.drawerlayout.widget.DrawerLayout;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Gravity;
@@ -73,6 +75,7 @@ public class HomeActivity extends AppCompatActivity {
         LinearLayout ll_hlogout=headerLayout.findViewById(R.id.ll_hlogout);
         AppCompatTextView tv_n_name=headerLayout.findViewById(R.id.tv_n_name);
         ImageView imageView=headerLayout.findViewById(R.id.profile_image);
+        LinearLayout ll_account=headerLayout.findViewById(R.id.ll_account);
         tv_n_name.setText(name);
         ll_profile.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -85,9 +88,13 @@ public class HomeActivity extends AppCompatActivity {
         ll_hlogout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                sharedPrefs.logOut();
-                finish();
-                Intent i=new Intent(HomeActivity.this,LoginActivity.class);
+               logOut();
+            }
+        });
+        ll_account.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i=new Intent(HomeActivity.this,AccountActivity.class);
                 startActivity(i);
                 overridePendingTransition(R.anim.right_in, R.anim.left_out);
             }
@@ -159,6 +166,8 @@ public class HomeActivity extends AppCompatActivity {
         overridePendingTransition(R.anim.right_in, R.anim.left_out);
     }
 
+
+
     public void openDrawer(View view) {
         drawer.openDrawer(Gravity.LEFT);
     }
@@ -189,6 +198,32 @@ public class HomeActivity extends AppCompatActivity {
             }
         });
         requestQueue.add(stringRequest);
+
+    }
+
+    void logOut()
+    {
+        AlertDialog.Builder alb=new AlertDialog.Builder(this);
+        alb.setTitle("Logout");
+        alb.setIcon(R.drawable.ic_exit_to_app_black_24dp);
+        alb.setMessage("Do you want Logout from Application");
+        alb.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                sharedPrefs.logOut();
+                finish();
+                Intent i=new Intent(HomeActivity.this,LoginActivity.class);
+                startActivity(i);
+                overridePendingTransition(R.anim.right_in, R.anim.left_out);
+            }
+        });
+        alb.setNegativeButton("No", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+        alb.create().show();
 
     }
 }

@@ -72,6 +72,19 @@
                 android:textColor="@color/text_color"
                 android:layout_height="wrap_content"/>
             <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="wrap_content"
+                android:layout_marginTop="12dp"
+                android:text="1 day ago"
+                android:fontFamily="@font/sspsemibold"
+                android:textSize="18sp"
+                android:layout_centerVertical="true"
+                android:id="@+id/tv_notary_name"
+                android:layout_toLeftOf="@+id/tv_status_rqst"
+                android:layout_marginEnd="12dp"
+                android:layout_marginBottom="12dp"
+                android:textColor="@color/text_color"
+                android:layout_height="wrap_content"/>
+            <androidx.appcompat.widget.AppCompatTextView
                 android:layout_width="100dp"
                 android:layout_marginTop="12dp"
                 android:text="New"

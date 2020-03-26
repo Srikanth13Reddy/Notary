@@ -65,12 +65,16 @@ public class LoginActivity extends AppCompatActivity implements SaveView
 
         if (et_mail.getText().toString().isEmpty())
         {
-            Toast.makeText(this, "Please enter email", Toast.LENGTH_SHORT).show();
+           // Toast.makeText(this, "Please enter email", Toast.LENGTH_SHORT).show();
+            et_mail.setError("Please enter email");
+            et_mail.requestFocus();
         }
         else {
             if (et_pass.getText().toString().isEmpty())
             {
-                Toast.makeText(this, "Please enter password", Toast.LENGTH_SHORT).show();
+               // Toast.makeText(this, "Please enter password", Toast.LENGTH_SHORT).show();
+                et_pass.setError("Please enter password");
+                et_pass.requestFocus();
             }
             else {
                 loginToNotary(et_mail.getText().toString().trim(),et_pass.getText().toString().trim());

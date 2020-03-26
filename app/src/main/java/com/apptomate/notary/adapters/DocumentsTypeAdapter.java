@@ -105,19 +105,17 @@ public class DocumentsTypeAdapter extends BaseAdapter
        AppCompatEditText et=v.findViewById(R.id.et_text);
        Button btn_acpt=v.findViewById(R.id.btn_acpt);
        alb.setView(v);
+       alb.setCancelable(false);
       AlertDialog ad= alb.create();
       ad.show();
-      btn_acpt.setOnClickListener(new View.OnClickListener() {
-          @Override
-          public void onClick(View v) {
-              if (et.getText().toString().equalsIgnoreCase(""))
-              {
-                  Toast.makeText(context, "Please enter comments", Toast.LENGTH_SHORT).show();
-              }
-              else {
-                  ad.cancel();
-                  changeStatus(documentDetailsId,status,et.getText().toString());
-              }
+      btn_acpt.setOnClickListener(v1 -> {
+          if (et.getText().toString().equalsIgnoreCase(""))
+          {
+              Toast.makeText(context, "Please enter comments", Toast.LENGTH_SHORT).show();
+          }
+          else {
+              ad.cancel();
+              changeStatus(documentDetailsId,status,et.getText().toString());
           }
       });
     }

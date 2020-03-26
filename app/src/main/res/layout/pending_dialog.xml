@@ -19,7 +19,7 @@
             android:paddingEnd="12dp"
             android:layout_margin="12dp"
             android:padding="10dp"
-            android:hint="Text something......"
+            android:hint="Tell the reason......"
             android:background="@null"
             android:id="@+id/et_text"
             android:layout_marginTop="14dp"
