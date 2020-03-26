@@ -91,6 +91,7 @@ public class ClientInfo extends AppCompatActivity implements SaveView , PopupMen
             @Override
             public void onClick(View v) {
                 Intent i=new Intent(ClientInfo.this,NotariesListActivity.class);
+                i.putExtra("rId",rId);
                 startActivity(i);
                 overridePendingTransition(R.anim.right_in, R.anim.left_out);
             }
@@ -106,6 +107,7 @@ public class ClientInfo extends AppCompatActivity implements SaveView , PopupMen
                 JSONObject js=new JSONObject(sharedPrefs.getLoginData().get(SharedPrefs.LOGIN_DATA));
                 id= js.optString("id");
                 roleId= js.optString("roleId");
+                Log.e("data",sharedPrefs.getLoginData().get(SharedPrefs.LOGIN_DATA));
             }
 
         } catch (JSONException e) {
@@ -156,11 +158,10 @@ public class ClientInfo extends AppCompatActivity implements SaveView , PopupMen
                 JSONObject js=new JSONObject(response);
                 JSONObject jsonObject= js.getJSONObject("request");
                 String fullAddress= jsonObject.optString("fullAddress");
-                String firstName= jsonObject.optString("firstName");
-                String lastName= jsonObject.optString("lastName");
+                String name= jsonObject.optString("name");
                  userRequestDetailsId= jsonObject.optString("userRequestDetailsId");
                 tv_client_shipping_address.setText(fullAddress);
-                tv_client_name.setText(firstName+" "+lastName);
+                tv_client_name.setText(name);
                 String documents= js.optString("documents");
                 String documentdetails= js.optString("documentdetails");
                 JSONArray jaa=new JSONArray(documentdetails);
