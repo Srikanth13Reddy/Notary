@@ -2,7 +2,7 @@
 <androidx.cardview.widget.CardView android:layout_width="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     app:cardCornerRadius="8dp"
-    android:elevation="5dp"
+    app:cardElevation="5dp"
     android:layout_margin="10dp"
     app:cardBackgroundColor="@color/white"
     android:layout_height="wrap_content"
@@ -14,23 +14,11 @@
         android:layout_height="wrap_content">
 
         <androidx.appcompat.widget.AppCompatTextView
-            android:layout_width="wrap_content"
-            android:text="Mary Helen"
-            android:layout_marginTop="12dp"
-            android:textSize="20sp"
-            android:fontFamily="@font/sspbold"
-            android:id="@+id/name_tv_process"
-            android:textColor="@color/black"
-            android:layout_height="wrap_content"/>
+            style="@style/request_name_textview_Style"
+            android:id="@+id/name_tv_process"/>
         <androidx.appcompat.widget.AppCompatTextView
-            android:layout_width="wrap_content"
-            android:layout_marginTop="12dp"
-            android:textSize="16sp"
-            android:fontFamily="@font/sspregular"
-            android:id="@+id/tv_address_process"
-            android:text="323 East W Wacker Dr, Chicago, IL 60601, United States"
-            android:textColor="@color/text_color"
-            android:layout_height="wrap_content"/>
+            style="@style/request_address_textview_Style"
+            android:id="@+id/tv_address_process"/>
 
 <!--        <androidx.appcompat.widget.AppCompatTextView-->
 <!--            android:layout_width="wrap_content"-->
@@ -40,14 +28,9 @@
 <!--            android:layout_height="wrap_content"/>-->
 
         <androidx.appcompat.widget.AppCompatTextView
-            android:layout_width="wrap_content"
-            android:layout_marginTop="12dp"
-            android:text="Documents - 04"
-            android:textSize="16sp"
-            android:fontFamily="@font/sspregular"
+            style="@style/request_address_textview_Style"
             android:id="@+id/tv_documents_process"
-            android:textColor="@color/black"
-            android:layout_height="wrap_content"/>
+            android:textColor="@color/colorPrimary"/>
 
         <ImageView
             android:layout_width="match_parent"
@@ -58,38 +41,22 @@
 
         <RelativeLayout
             android:layout_width="match_parent"
+            android:layout_marginTop="12dp"
             android:layout_height="wrap_content">
             <androidx.appcompat.widget.AppCompatTextView
-                android:layout_width="wrap_content"
-                android:layout_marginTop="12dp"
-                android:textSize="16sp"
-                android:fontFamily="@font/sspregular"
-                android:text="1 day ago"
+                style="@style/request_address_textview_Style"
                 android:id="@+id/tv_time_process"
-                android:layout_centerVertical="true"
-                android:layout_marginBottom="12dp"
-                android:textColor="@color/text_color"
-                android:layout_height="wrap_content"/>
+                android:textSize="14sp"/>
             <androidx.appcompat.widget.AppCompatTextView
-                android:layout_width="wrap_content"
-                android:layout_marginTop="12dp"
-                android:text="1 day ago"
-                android:fontFamily="@font/sspsemibold"
-                android:textSize="18sp"
-                android:layout_centerVertical="true"
+                style="@style/request_notaryname_textview_Style"
                 android:id="@+id/tv_notary_name"
-                android:layout_toLeftOf="@+id/tv_process_s"
-                android:layout_marginEnd="12dp"
-                android:layout_marginBottom="12dp"
-                android:textColor="@color/text_color"
-                android:layout_height="wrap_content"/>
+                android:layout_toStartOf="@+id/tv_process_s"/>
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:layout_width="wrap_content"
-                android:layout_marginTop="12dp"
-                android:text="Inprogress"
-                android:backgroundTint="@color/processing"
-                android:background="@drawable/request_drawable"
+                android:text="@string/inprogress"
+                android:layout_centerVertical="true"
+                android:background="@drawable/inprogress_drawable"
                 android:layout_marginBottom="12dp"
                 android:layout_alignParentEnd="true"
                 android:layout_marginStart="12dp"

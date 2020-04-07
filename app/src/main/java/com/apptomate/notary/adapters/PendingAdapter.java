@@ -22,6 +22,9 @@ import org.json.JSONException;
 import java.util.ArrayList;
 import java.util.Locale;
 
+import static com.apptomate.notary.utils.ApiConstants.time;
+import static com.apptomate.notary.utils.ApiConstants.toTitleCase;
+
 public class PendingAdapter extends RecyclerView.Adapter<PendingAdapter.MyHolder>
 {
     Context context;
@@ -53,13 +56,16 @@ public class PendingAdapter extends RecyclerView.Adapter<PendingAdapter.MyHolder
         if (imageModelArrayList.get(position)!=null)
         {
             RequestModel obj=imageModelArrayList.get(position);
+            holder.tv_time_pending.setText(time(obj.getRequestedDate()));
             holder.tv_documents_pending.setText("Documents - "+obj.getDocumentsCount());
             holder.tv_address_pending.setText(obj.getFullAddress());
-            holder.name_tv_pending.setText(obj.getName());
-            holder.tv_notary_name.setText(obj.getAssignedToName());
+            holder.name_tv_pending.setText(toTitleCase(obj.getName()));
+           // holder.tv_notary_name.setText(obj.getAssignedToName());
+            holder.tv_notary_name.setText(toTitleCase(obj.getAssignedToName()));
             holder.itemView.setOnClickListener(v -> {
                 Intent i=new Intent(context, ClientInfo.class);
                 i.putExtra("rId",obj.getUserRequestDetailsId());
+                i.putExtra("status",obj.getStatus());
                 context.startActivity(i);
                 Activity mContext = (Activity) context;
                 mContext.overridePendingTransition(R.anim.right_in, R.anim.left_out);

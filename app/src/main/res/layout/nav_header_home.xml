@@ -13,13 +13,14 @@
         android:background="@color/colorPrimary"
         android:layout_height="120dp">
 
-        <ImageView
-            android:id="@+id/profile_image"
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/profile_image_nav"
             android:layout_centerVertical="true"
             android:layout_marginStart="12dp"
             android:src="@drawable/profile"
             android:layout_width="60dp"
             android:layout_height="60dp" />
+
 
         <androidx.appcompat.widget.AppCompatTextView
             android:layout_width="match_parent"
@@ -31,7 +32,7 @@
             android:textStyle="bold"
             android:fontFamily="@font/sspbold"
             android:textColor="@color/white"
-            android:layout_toRightOf="@id/profile_image"
+            android:layout_toRightOf="@id/profile_image_nav"
             android:layout_height="wrap_content"/>
 
     </RelativeLayout>
@@ -67,7 +68,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:gravity="center|start"
-            android:id="@+id/ll_sms"
+            android:id="@+id/ll_home"
             android:layout_height="wrap_content">
             <androidx.appcompat.widget.AppCompatImageView
                 style="@style/Nav_ImageView"

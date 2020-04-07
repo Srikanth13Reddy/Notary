@@ -14,23 +14,11 @@
         android:layout_height="wrap_content">
 
         <androidx.appcompat.widget.AppCompatTextView
-            android:layout_width="wrap_content"
-            android:text="Mary Helen"
-            android:layout_marginTop="12dp"
-            android:fontFamily="@font/sspbold"
-            android:textSize="20sp"
-            android:id="@+id/name_tv_pending"
-            android:textColor="@color/black"
-            android:layout_height="wrap_content"/>
+            style="@style/request_name_textview_Style"
+            android:id="@+id/name_tv_pending"/>
         <androidx.appcompat.widget.AppCompatTextView
-            android:layout_width="wrap_content"
-            android:layout_marginTop="12dp"
-            android:textSize="16sp"
-            android:fontFamily="@font/sspregular"
-            android:id="@+id/tv_address_pending"
-            android:text="323 East W Wacker Dr, Chicago, IL 60601, United States"
-            android:textColor="@color/text_color"
-            android:layout_height="wrap_content"/>
+            style="@style/request_address_textview_Style"
+            android:id="@+id/tv_address_pending"/>
 
 <!--        <androidx.appcompat.widget.AppCompatTextView-->
 <!--            android:layout_width="wrap_content"-->
@@ -58,39 +46,23 @@
 
         <RelativeLayout
             android:layout_width="match_parent"
+            android:layout_marginTop="12dp"
             android:layout_height="wrap_content">
             <androidx.appcompat.widget.AppCompatTextView
-                android:layout_width="wrap_content"
-                android:layout_marginTop="12dp"
-                android:text="1 day ago"
+                style="@style/request_address_textview_Style"
                 android:id="@+id/tv_time_pending"
-                android:layout_centerVertical="true"
-                android:layout_marginBottom="12dp"
-                android:textSize="16sp"
-                android:fontFamily="@font/sspregular"
-                android:textColor="@color/text_color"
-                android:layout_height="wrap_content"/>
+                android:textSize="14sp"/>
             <androidx.appcompat.widget.AppCompatTextView
-                android:layout_width="wrap_content"
-                android:layout_marginTop="12dp"
-                android:text="1 day ago"
-                android:fontFamily="@font/sspsemibold"
-                android:textSize="18sp"
-                android:layout_centerVertical="true"
+                style="@style/request_notaryname_textview_Style"
                 android:id="@+id/tv_notary_name"
-                android:layout_toLeftOf="@+id/tv_pending_p"
-                android:layout_marginEnd="12dp"
-                android:layout_marginBottom="12dp"
-                android:textColor="@color/text_color"
-                android:layout_height="wrap_content"/>
+                android:layout_toStartOf="@+id/tv_pending_p"/>
             <androidx.appcompat.widget.AppCompatTextView
                 android:layout_width="wrap_content"
-                android:layout_marginTop="12dp"
-                android:text="Pending"
+                android:text="@string/pending"
+                android:layout_centerVertical="true"
                 android:textSize="16sp"
                 android:fontFamily="@font/sspregular"
-                android:backgroundTint="@color/pending"
-                android:background="@drawable/request_drawable"
+                android:background="@drawable/pending_drawable"
                 android:layout_marginBottom="12dp"
                 android:layout_alignParentEnd="true"
                 android:layout_marginStart="12dp"

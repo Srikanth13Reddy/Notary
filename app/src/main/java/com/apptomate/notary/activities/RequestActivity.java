@@ -43,7 +43,7 @@ public class RequestActivity extends AppCompatActivity implements SaveView
     RecyclerView rv_notification;
     ProgressDialog progressDialog;
     SharedPrefs sharedPrefs;
-    String id;
+    String id,token;
     ArrayList<RequestModel> al=new ArrayList<>();
     private SearchView searchView;
     AppCompatTextView tv_notFound,tv_req_notfound;
@@ -74,7 +74,8 @@ public class RequestActivity extends AppCompatActivity implements SaveView
             if (sharedPrefs.getLoginData().get(SharedPrefs.LOGIN_DATA)!=null)
             {
                 JSONObject js=new JSONObject(sharedPrefs.getLoginData().get(SharedPrefs.LOGIN_DATA));
-               id= js.optString("id");
+                id= js.optString("id");
+                token= js.optString("token");
             }
 
         } catch (JSONException e) {
@@ -85,7 +86,7 @@ public class RequestActivity extends AppCompatActivity implements SaveView
     private void getRequestData(String type)
     {
        progressDialog.show();
-       new SaveImpl(this).handleSave(new JSONObject(),"requests?saasUserId="+id,"GET",type);
+       new SaveImpl(this).handleSave(new JSONObject(),"requests?saasUserId="+id,"GET",type,token);
     }
 
 
@@ -271,7 +272,8 @@ public class RequestActivity extends AppCompatActivity implements SaveView
     }
 
     @Override
-    protected void onRestart() {
+    protected void onRestart()
+    {
         super.onRestart();
         getRequestData(sharedPrefs.getStatus().get(SharedPrefs.STATUS_DATA));
     }

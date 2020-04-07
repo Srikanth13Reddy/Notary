@@ -34,13 +34,29 @@
         android:orientation="vertical"
         android:layout_alignParentBottom="true"
         android:layout_height="70dp">
-        <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/btn_acpt"
-            android:text="Pending"
-            android:layout_marginStart="40dp"
-            android:backgroundTint="@color/pending"
-            android:layout_marginEnd="40dp"
-            style="@style/Button_Style"/>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btn_cancel"
+                android:layout_width="120dp"
+                android:text="Cancel"
+                android:layout_marginStart="20sp"
+                android:layout_marginEnd="20sp"
+                style="@style/Button_Style"/>
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btn_acpt"
+                android:layout_width="120dp"
+                android:text="Pending"
+                android:layout_alignParentEnd="true"
+                android:layout_marginStart="20sp"
+                android:background="@drawable/pending_drawable"
+                android:layout_marginEnd="20sp"
+                style="@style/Button_Style"/>
+        </RelativeLayout>
+
 
     </LinearLayout>
 

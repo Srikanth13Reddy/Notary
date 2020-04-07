@@ -22,6 +22,9 @@ import org.json.JSONException;
 import java.util.ArrayList;
 import java.util.Locale;
 
+import static com.apptomate.notary.utils.ApiConstants.time;
+import static com.apptomate.notary.utils.ApiConstants.toTitleCase;
+
 
 public class InprogressAdapter extends RecyclerView.Adapter<InprogressAdapter.MyHolder>
 {
@@ -53,13 +56,16 @@ public class InprogressAdapter extends RecyclerView.Adapter<InprogressAdapter.My
         if (imageModelArrayList.get(position)!=null)
         {
             RequestModel obj=imageModelArrayList.get(position);
+            holder.tv_time_process.setText(time(obj.getRequestedDate()));
             holder.tv_documents_process.setText("Documents - "+obj.getDocumentsCount());
             holder.tv_address_process.setText(obj.getFullAddress());
-            holder.name_tv_process.setText(obj.getName());
-            holder.tv_notary_name.setText(obj.getAssignedToName());
+            holder.name_tv_process.setText(toTitleCase(obj.getName()));
+           // holder.tv_notary_name.setText(obj.getAssignedToName());
+            holder.tv_notary_name.setText(toTitleCase(obj.getAssignedToName()));
             holder.itemView.setOnClickListener(v -> {
                 Intent i=new Intent(context, ClientInfo.class);
                 i.putExtra("rId",obj.getUserRequestDetailsId());
+                i.putExtra("status",obj.getStatus());
                 context.startActivity(i);
                 Activity mContext = (Activity) context;
                 mContext.overridePendingTransition(R.anim.right_in, R.anim.left_out);
@@ -94,11 +100,11 @@ public class InprogressAdapter extends RecyclerView.Adapter<InprogressAdapter.My
         return imageModelArrayList.size();
     }
 
-    public class MyHolder extends RecyclerView.ViewHolder
+    class MyHolder extends RecyclerView.ViewHolder
     {
         AppCompatTextView tv_time_process,name_tv_process,tv_address_process,tv_documents_process,tv_notary_name;
 
-        public MyHolder(@NonNull View v) {
+        MyHolder(@NonNull View v) {
             super(v);
             tv_time_process= v.findViewById(R.id.tv_time_process);
             name_tv_process= v.findViewById(R.id.name_tv_process);

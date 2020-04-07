@@ -31,7 +31,7 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
     // implementation 'com.github.barteksc:android-pdf-viewer:3.0.0-beta.5'
-    implementation "com.google.android.material:material:1.2.0-alpha05"
+    implementation 'com.google.android.material:material:1.0.0'
     implementation "androidx.cardview:cardview:1.0.0"
     implementation 'androidx.recyclerview:recyclerview:1.1.0'
     implementation 'com.android.volley:volley:1.1.1'
@@ -41,4 +41,10 @@ dependencies {
     //implementation 'com.github.piruin:quickaction:2.2'
     implementation 'com.github.douglasjunior:android-simple-tooltip:0.2.3'
     implementation 'com.squareup.picasso:picasso:2.71828'
+    implementation 'com.karumi:dexter:4.2.0'
+    implementation 'com.github.mukeshsolanki:android-otpview-pinview:2.1.0'
+    //  implementation 'net.time4j:time4j-android:3.44.4-2018e'
+    //implementation 'org.ocpsoft.prettytime:prettytime:4.0.1.Final'
+    implementation 'com.google.firebase:firebase-messaging:11.0.4'
 }
+apply plugin: 'com.google.gms.google-services'

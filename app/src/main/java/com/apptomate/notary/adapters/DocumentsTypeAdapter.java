@@ -18,6 +18,7 @@ import android.widget.Toast;
 import androidx.appcompat.widget.AppCompatEditText;
 import androidx.appcompat.widget.AppCompatTextView;
 
+import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.VolleyError;
@@ -27,21 +28,28 @@ import com.apptomate.notary.R;
 import com.apptomate.notary.activities.ClientInfo;
 import com.apptomate.notary.models.DocumentsDetailsModel;
 import com.apptomate.notary.utils.ApiConstants;
+import com.apptomate.notary.utils.MySingleton;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class DocumentsTypeAdapter extends BaseAdapter
 {
     ArrayList<DocumentsDetailsModel> arrayList;
     Context context;
+    String token;
+    String status;
 
-    public DocumentsTypeAdapter(ArrayList<DocumentsDetailsModel> arrayList, Context context) {
+    public DocumentsTypeAdapter(ArrayList<DocumentsDetailsModel> arrayList, Context context, String token, String status) {
         this.arrayList = arrayList;
         this.context = context;
+        this.token=token;
+        this.status=status;
     }
 
     @Override
@@ -72,24 +80,34 @@ public class DocumentsTypeAdapter extends BaseAdapter
         else {
             aSwitch.setChecked(true);
         }
+
+        if (status.equalsIgnoreCase("Completed"))
+        {
+            aSwitch.setClickable(false);
+        }
+        else {
+            aSwitch.setClickable(true);
+        }
         AppCompatTextView fname=v.findViewById(R.id.fname);
         AppCompatTextView sname=v.findViewById(R.id.sname);
         AppCompatTextView service=v.findViewById(R.id.service);
         fname.setText(""+(position+1)+"."+ arrayList.get(position).getDocumentName());
         sname.setText(arrayList.get(position).getStateName());
         service.setText(arrayList.get(position).getServiceName());
+
         aSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked)
             {
 
-
-                 if (arrayList.get(position).getStatus().equalsIgnoreCase("Unverified"))
+                if (arrayList.get(position).getStatus().equalsIgnoreCase("Unverified"))
                  {
                      changeStatus(arrayList.get(position).getDocumentDetailsId(),"Verified","");
                  }
                  else {
-                      showTextDialog(arrayList.get(position).getDocumentDetailsId(),"Unverified");
+
+                     changeStatus(arrayList.get(position).getDocumentDetailsId(),"Unverified","");
+                      //showTextDialog(arrayList.get(position).getDocumentDetailsId(),"Unverified");
                  }
 
             }
@@ -133,7 +151,6 @@ public class DocumentsTypeAdapter extends BaseAdapter
         }
 
         final String requestBody=js.toString();
-        RequestQueue requestQueue= Volley.newRequestQueue(context);
         StringRequest stringRequest= new StringRequest(Request.Method.PUT, ApiConstants.BaseUrl + "/document?documentId="+id, new com.android.volley.Response.Listener<String>() {
             @Override
             public void onResponse(String response)
@@ -160,6 +177,7 @@ public class DocumentsTypeAdapter extends BaseAdapter
             @Override
             public void onErrorResponse(VolleyError error)
             {
+                ApiConstants.parseVolleyError(context,error);
                 progressDialog.dismiss();
                 Log.e("Response",""+error);
             }
@@ -174,7 +192,15 @@ public class DocumentsTypeAdapter extends BaseAdapter
             public String getBodyContentType() {
                 return "application/json; charset=utf-8";
             }
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError
+            {
+                HashMap<String,String> hm=new HashMap<>();
+                hm.put("Authorization","Bearer "+token);
+                return hm;
+            }
         };
-        requestQueue.add(stringRequest);
+        MySingleton.getInstance(context).addToRequestQueue(stringRequest);
     }
 }

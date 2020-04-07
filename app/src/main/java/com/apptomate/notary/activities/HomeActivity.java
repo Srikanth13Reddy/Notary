@@ -7,35 +7,45 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.drawerlayout.widget.DrawerLayout;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.Gravity;
+import android.os.Handler;
 import android.view.View;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
 import com.apptomate.notary.R;
+import com.apptomate.notary.interfaces.SaveView;
 import com.apptomate.notary.utils.ApiConstants;
+import com.apptomate.notary.utils.MySingleton;
+import com.apptomate.notary.utils.SaveImpl;
 import com.apptomate.notary.utils.SharedPrefs;
 import com.google.android.material.navigation.NavigationView;
-
+import com.squareup.picasso.Picasso;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class HomeActivity extends AppCompatActivity {
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
+
+import de.hdodenhof.circleimageview.CircleImageView;
+
+import static com.apptomate.notary.utils.ApiConstants.toTitleCase;
+
+public class HomeActivity extends AppCompatActivity implements SaveView
+{
 
     Toolbar toolbar;
+    int LAUNCH_SECOND_ACTIVITY = 1;
     NavigationView navigationView;
     ActionBarDrawerToggle toggle;
     DrawerLayout drawer;
@@ -45,9 +55,14 @@ public class HomeActivity extends AppCompatActivity {
     String id;
     ProgressDialog progressDialog;
     AppCompatTextView tv_count;
+    private CircleImageView profile_image_nav;
+    private boolean doubleBackToExitPressedOnce=false;
+    AppCompatTextView tv_not_count;
+    private String token;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState)
+    {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
         toolbar = findViewById(R.id.toolbar);
@@ -58,10 +73,17 @@ public class HomeActivity extends AppCompatActivity {
         toggle.getDrawerArrowDrawable().setColor(getResources().getColor(R.color.colorPrimaryDark));
         drawer.addDrawerListener(toggle);
         toggle.syncState();
+        toggle.getDrawerArrowDrawable().setColor(getResources().getColor(R.color.white));
+      //  toggle.setDrawerIndicatorEnabled(false);
+//        toolbar.setNavigationIcon(null);
+      //  setSupportActionBar(toolbar);
+       // getSupportActionBar().setElevation(0);
         findViews();
         navHeader();
         getLoginData();
         getCount();
+        getNotificationCount();
+        getProfile();
 
 //        getSupportActionBar().hide();
     }
@@ -72,32 +94,23 @@ public class HomeActivity extends AppCompatActivity {
         ///  ListView lv=headerLayout.findViewById(R.id.lv_nav);
         // lv.setAdapter(new NavMenuAdapter(this));
         LinearLayout ll_profile=headerLayout.findViewById(R.id.ll_profile);
+         profile_image_nav= headerLayout.findViewById(R.id.profile_image_nav);
         LinearLayout ll_hlogout=headerLayout.findViewById(R.id.ll_hlogout);
         AppCompatTextView tv_n_name=headerLayout.findViewById(R.id.tv_n_name);
-        ImageView imageView=headerLayout.findViewById(R.id.profile_image);
+        LinearLayout ll_home=headerLayout.findViewById(R.id.ll_home);
         LinearLayout ll_account=headerLayout.findViewById(R.id.ll_account);
-        tv_n_name.setText(name);
-        ll_profile.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent i=new Intent(HomeActivity.this,ProfileActivity.class);
-                startActivity(i);
-                overridePendingTransition(R.anim.right_in, R.anim.left_out);
-            }
+        tv_n_name.setText(toTitleCase(name));
+        ll_profile.setOnClickListener(v -> {
+            Intent i=new Intent(HomeActivity.this,ProfileActivity.class);
+            startActivityForResult(i,3);
+            overridePendingTransition(R.anim.right_in, R.anim.left_out);
         });
-        ll_hlogout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-               logOut();
-            }
-        });
-        ll_account.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent i=new Intent(HomeActivity.this,AccountActivity.class);
-                startActivity(i);
-                overridePendingTransition(R.anim.right_in, R.anim.left_out);
-            }
+        ll_home.setOnClickListener(v -> drawer.closeDrawers());
+        ll_hlogout.setOnClickListener(v -> logOut());
+        ll_account.setOnClickListener(v -> {
+            Intent i = new Intent(HomeActivity.this, AccountActivity.class);
+            HomeActivity.this.startActivity(i);
+            HomeActivity.this.overridePendingTransition(R.anim.right_in, R.anim.left_out);
         });
     }
 
@@ -107,8 +120,9 @@ public class HomeActivity extends AppCompatActivity {
         try {
             if (sharedPrefs.getLoginData().get(SharedPrefs.LOGIN_DATA)!=null)
             {
-                JSONObject js=new JSONObject(sharedPrefs.getLoginData().get(SharedPrefs.LOGIN_DATA));
+                JSONObject js=new JSONObject(Objects.requireNonNull(sharedPrefs.getLoginData().get(SharedPrefs.LOGIN_DATA)));
                 id= js.optString("id");
+                token= js.optString("token");
             }
 
         } catch (JSONException e) {
@@ -122,20 +136,30 @@ public class HomeActivity extends AppCompatActivity {
         sharedPrefs=new SharedPrefs(this);
        String data= sharedPrefs.getLoginData().get(SharedPrefs.LOGIN_DATA);
         try {
-            JSONObject js=new JSONObject(data);
-           name= js.optString("name");
+            JSONObject js;
+            if (data != null) {
+                js = new JSONObject(data);
+                name= js.optString("name");
+            }
+
         } catch (JSONException e) {
             e.printStackTrace();
         }
         tv_name=findViewById(R.id.tv_name_home);
+        tv_not_count=findViewById(R.id.not_count);
         tv_count=findViewById(R.id.tv_count);
-        tv_name.setText(name);
+        tv_name.setText(toTitleCase(name));
+        tv_not_count.setVisibility(View.GONE);
     }
 
     public void notification(View view) {
 
+
+//        Intent i = new Intent(this, SecondActivity.class);
+//        startActivityForResult(i, LAUNCH_SECOND_ACTIVITY);
+
         Intent i=new Intent(HomeActivity.this,NotificationActivity.class);
-        startActivity(i);
+        startActivityForResult(i, LAUNCH_SECOND_ACTIVITY);
         overridePendingTransition(R.anim.right_in, R.anim.left_out);
     }
 
@@ -167,37 +191,38 @@ public class HomeActivity extends AppCompatActivity {
     }
 
 
-
-    public void openDrawer(View view) {
-        drawer.openDrawer(Gravity.LEFT);
-    }
+//
+//    public void openDrawer(View view) {
+//        drawer.openDrawer(Gravity.LEFT);
+//    }
 
     void getCount()
     {
         progressDialog.show();
-        RequestQueue requestQueue= Volley.newRequestQueue(this);
-        StringRequest stringRequest=new StringRequest(Request.Method.GET, ApiConstants.BaseUrl + "requests?saasUserId=" + id, new Response.Listener<String>() {
-            @SuppressLint("SetTextI18n")
-            @Override
-            public void onResponse(String response) {
-                progressDialog.dismiss();
-                try {
-                    JSONArray ja=new JSONArray(response);
-                   int count= ja.length();
-                    tv_count.setText(""+count);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
+        @SuppressLint("SetTextI18n") StringRequest stringRequest=new StringRequest(Request.Method.GET, ApiConstants.BaseUrl + "requests?saasUserId=" + id, response -> {
+            progressDialog.dismiss();
+            try {
+                JSONArray ja=new JSONArray(response);
+               int count= ja.length();
+                tv_count.setText(""+count);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
 
-            }
-        }, new Response.ErrorListener() {
+        }, error -> {
+            progressDialog.dismiss();
+            ApiConstants.parseVolleyError(HomeActivity.this,error);
+        })
+        {
             @Override
-            public void onErrorResponse(VolleyError error) {
-                progressDialog.dismiss();
-                Toast.makeText(HomeActivity.this, ""+error, Toast.LENGTH_SHORT).show();
+            public Map<String, String> getHeaders() throws AuthFailureError
+            {
+                HashMap<String,String> hm=new HashMap<>();
+                hm.put("Authorization","Bearer "+token);
+                return hm;
             }
-        });
-        requestQueue.add(stringRequest);
+        };
+        MySingleton.getInstance(this).addToRequestQueue(stringRequest);
 
     }
 
@@ -207,23 +232,147 @@ public class HomeActivity extends AppCompatActivity {
         alb.setTitle("Logout");
         alb.setIcon(R.drawable.ic_exit_to_app_black_24dp);
         alb.setMessage("Do you want Logout from Application");
-        alb.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                sharedPrefs.logOut();
-                finish();
-                Intent i=new Intent(HomeActivity.this,LoginActivity.class);
-                startActivity(i);
-                overridePendingTransition(R.anim.right_in, R.anim.left_out);
-            }
+        alb.setPositiveButton("Yes", (dialog, which) -> {
+            sharedPrefs.logOut();
+            finish();
+            Intent i=new Intent(HomeActivity.this,LoginActivity.class);
+            startActivity(i);
+            overridePendingTransition(R.anim.right_in, R.anim.left_out);
         });
-        alb.setNegativeButton("No", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-            }
-        });
+        alb.setNegativeButton("No", (dialog, which) -> dialog.dismiss());
         alb.create().show();
 
     }
+    void getProfile()
+    {
+        new SaveImpl(this).handleSave(new JSONObject(),"saasuser?saasUserId="+id,"GET","",token);
+    }
+
+    @Override
+    public void onSaveSucess(String code, String response, String type) {
+        if (code.equalsIgnoreCase("200"))
+        {
+            try {
+                JSONObject jsonObject=new JSONObject(response);
+                JSONObject js=jsonObject.getJSONObject("user");
+                String profileImage=js.optString("profileImage");
+                if (profileImage.equalsIgnoreCase(""))
+                {
+                    profile_image_nav.setImageResource(R.drawable.profile_d);
+                }else {
+                    Picasso.get().load(profileImage).placeholder(R.drawable.profile_d).into(profile_image_nav);
+                }
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    @Override
+    public void onSaveFailure(String error)
+    {
+        Toast.makeText(this, ""+error, Toast.LENGTH_SHORT).show();
+
+    }
+
+//    @Override
+//    protected void onRestart() {
+//        super.onRestart();
+//        getProfile();
+//    }
+
+    @Override
+    public void onBackPressed() {
+
+        if(doubleBackToExitPressedOnce){
+
+            moveTaskToBack(true);
+            this.finishAffinity();
+            return;
+        }
+        this.doubleBackToExitPressedOnce=true;
+        Toast.makeText(this,"Please Double click to exit app",Toast.LENGTH_LONG).show();
+
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                doubleBackToExitPressedOnce=false;
+            }
+        },2000);
+    }
+
+    void getNotificationCount()
+    {
+        progressDialog.show();
+        @SuppressLint("SetTextI18n") StringRequest stringRequest=new StringRequest(Request.Method.GET, ApiConstants.BaseUrl +"saasusernotification?saasUserId=" + id, response -> {
+            progressDialog.dismiss();
+            ArrayList<Integer> arrayList=new ArrayList<>();
+            try {
+                JSONArray ja=new JSONArray(response);
+                for (int i=0;i<ja.length();i++)
+                {
+                   JSONObject json= ja.getJSONObject(i);
+                   if (json.optString("status").equalsIgnoreCase("send"))
+                   {
+                       arrayList.add(i);
+                   }
+                }
+                if (arrayList.size()>0)
+                {
+                    tv_not_count.setVisibility(View.VISIBLE);
+                    tv_not_count.setText(""+arrayList.size());
+                }
+                else {
+                    tv_not_count.setVisibility(View.GONE);
+                }
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+        }, error -> {
+            progressDialog.dismiss();
+            ApiConstants.parseVolleyError(HomeActivity.this,error);
+        })
+        {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError
+            {
+                HashMap<String,String> hm=new HashMap<>();
+                hm.put("Authorization","Bearer "+token);
+                return hm;
+            }
+        };
+        MySingleton.getInstance(this).addToRequestQueue(stringRequest);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == LAUNCH_SECOND_ACTIVITY) {
+            if(resultCode == Activity.RESULT_OK){
+                String result=data.getStringExtra("result");
+                if (result != null && result.equalsIgnoreCase("notificationResult")) {
+                    getNotificationCount();
+                }
+            }
+            if (resultCode == Activity.RESULT_CANCELED) {
+                //Write your code if there's no result
+            }
+        }
+        else if (requestCode==3)
+        {
+
+
+            if (resultCode == Activity.RESULT_OK) {
+                String result = data.getStringExtra("result");
+                if (result != null && result.equalsIgnoreCase("profile")) {
+                    getProfile();
+                }
+            }
+        }
+    }
+    //onActivityResult
 }

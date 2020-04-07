@@ -17,6 +17,9 @@ public class SharedPrefs
     private static final String IS_LOGIN = "IsLoggedIn";
     public static final String LOGIN_DATA="LOGIN_DATA";
     public static final String STATUS_DATA="STATUS_DATA";
+    public static final String STATUS_DATA_COMPLETE="STATUS_DATA_COMPLETE";
+    public static final String STATUS_DATA_PENDING="STATUS_DATA_PENDING";
+    public static final String STATUS_DATA_PROCESS="STATUS_DATA_PROCESS";
     // Shared Preferences
     SharedPreferences pref;
     // Editor for Shared preferences
@@ -77,12 +80,62 @@ public class SharedPrefs
         editor.putString(STATUS_DATA, String.valueOf(res));
         editor.commit();
     }
+
+
+    public void saveCompleteStatus(String res)
+    {
+        editor.putString(STATUS_DATA_COMPLETE, String.valueOf(res));
+        editor.commit();
+    }
+
+    public void savePendingteStatus(String res)
+    {
+        editor.putString(STATUS_DATA_PENDING, String.valueOf(res));
+        editor.commit();
+    }
+
+    public void saveProcessteStatus(String res)
+    {
+        editor.putString(STATUS_DATA_PROCESS, String.valueOf(res));
+        editor.commit();
+    }
+
     public HashMap<String, String> getStatus()
     {
         HashMap<String, String> user = new HashMap<String, String>();
         // user name
 
         user.put(STATUS_DATA, pref.getString(STATUS_DATA, ""));
+
+        return user;
+    }
+
+    public HashMap<String, String> getCompleteStatus()
+    {
+        HashMap<String, String> user = new HashMap<String, String>();
+        // user name
+
+        user.put(STATUS_DATA_COMPLETE, pref.getString(STATUS_DATA_COMPLETE, ""));
+
+        return user;
+    }
+
+    public HashMap<String, String> getPEndingStatus()
+    {
+        HashMap<String, String> user = new HashMap<String, String>();
+        // user name
+
+        user.put(STATUS_DATA_PENDING, pref.getString(STATUS_DATA_PENDING, ""));
+
+        return user;
+    }
+
+    public HashMap<String, String> getProcessStatus()
+    {
+        HashMap<String, String> user = new HashMap<String, String>();
+        // user name
+
+        user.put(STATUS_DATA_PROCESS, pref.getString(STATUS_DATA_PROCESS, ""));
 
         return user;
     }

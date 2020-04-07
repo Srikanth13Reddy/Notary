@@ -32,6 +32,7 @@ public class NotariesListActivity extends AppCompatActivity implements SaveView
     ProgressDialog progressDialog;
     RecyclerView rv_notary;
     String rId;
+    private String token;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,7 +54,7 @@ public class NotariesListActivity extends AppCompatActivity implements SaveView
     private void getData()
     {
         progressDialog.show();
-        new SaveImpl(this).handleSave(new JSONObject(),"agencynotaries?agencyId="+agencyId,"GET","");
+        new SaveImpl(this).handleSave(new JSONObject(),"agencynotaries?agencyId="+agencyId,"GET","",token);
     }
 
     private void getLoginData()
@@ -64,6 +65,7 @@ public class NotariesListActivity extends AppCompatActivity implements SaveView
             {
                 JSONObject js=new JSONObject(sharedPrefs.getLoginData().get(SharedPrefs.LOGIN_DATA));
                 id= js.optString("id");
+                token= js.optString("token");
                 agencyId= js.optString("agencyId");
             }
 
@@ -113,7 +115,7 @@ public class NotariesListActivity extends AppCompatActivity implements SaveView
                 arrayList.add(notaryListModel);
 
             }
-            NotaryListAdapter notaryListAdapter=new NotaryListAdapter(arrayList,this,rId);
+            NotaryListAdapter notaryListAdapter=new NotaryListAdapter(arrayList,this,rId,id,token);
             rv_notary.setAdapter(notaryListAdapter);
         } catch (JSONException e) {
             e.printStackTrace();

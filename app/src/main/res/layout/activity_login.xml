@@ -29,43 +29,25 @@
                 android:layout_height="wrap_content"/>
 
             <androidx.appcompat.widget.AppCompatEditText
-                android:layout_width="match_parent"
-                android:hint="Email"
-                android:inputType="textEmailAddress"
-                android:textColor="@color/black"
-                android:padding="12dp"
-                android:fontFamily="@font/sspregular"
+                style="@style/editText_Style"
+                android:hint="@string/email"
+                android:inputType="text"
                 android:id="@+id/login_email_tv"
-                android:layout_marginTop="48dp"
-                android:background="@drawable/edittext_drawable"
-                android:layout_height="wrap_content"/>
+                android:layout_marginTop="48dp"/>
 
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_marginTop="24dp"
                 android:layout_height="wrap_content">
                 <androidx.appcompat.widget.AppCompatEditText
-                    android:layout_width="match_parent"
+                    style="@style/editText_Style"
                     android:hint="@string/password"
-                    android:textColor="@color/black"
-                    android:padding="12dp"
-                    android:fontFamily="@font/sspregular"
                     android:id="@+id/logon_pass_tv"
-                    android:inputType="textPassword"
-                    android:background="@drawable/edittext_drawable"
-                    android:layout_height="wrap_content"/>
+                    android:inputType="textPassword"/>
 
                 <CheckBox
-                    android:id="@+id/log_checkBox"
-                    android:layout_width="wrap_content"
-                    android:layout_centerHorizontal="true"
-                    android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:layout_marginRight="15dp"
-                    android:layout_alignParentRight="true"
-                    android:button="@drawable/password_icon_selector"
-                    android:textAppearance="?android:attr/textAppearanceLarge"
-                    android:textColor="@color/colorPrimary" />
+                    style="@style/checkbox_Style"
+                    android:id="@+id/log_checkBox"/>
             </RelativeLayout>
 
 
@@ -84,6 +66,7 @@
                 android:textAlignment="center"
                 android:fontFamily="@font/sspregular"
                 android:textSize="20sp"
+                android:onClick="forgotPassword"
                 android:textColor="@color/text_color"
                 android:text="@string/forgot_password"
                 android:layout_height="45dp"/>

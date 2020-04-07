@@ -14,41 +14,16 @@
         android:layout_height="wrap_content">
 
         <androidx.appcompat.widget.AppCompatTextView
-            android:layout_width="wrap_content"
-            android:text="Mary Helen"
-            android:layout_marginTop="12dp"
-            android:textSize="20sp"
-            android:fontFamily="@font/sspbold"
-            android:id="@+id/name_tv_rqst"
-            android:textColor="@color/black"
-            android:layout_height="wrap_content"/>
+            style="@style/request_name_textview_Style"
+            android:id="@+id/name_tv_rqst"/>
         <androidx.appcompat.widget.AppCompatTextView
-            android:layout_width="wrap_content"
-            android:layout_marginTop="12dp"
-            android:textSize="16sp"
-            android:id="@+id/tv_address_rqst"
-            android:fontFamily="@font/sspregular"
-            android:text="323 East W Wacker Dr, Chicago, IL 60601, United States"
-            android:textColor="@color/text_color"
-            android:layout_height="wrap_content"/>
-
-<!--        <androidx.appcompat.widget.AppCompatTextView-->
-<!--            android:layout_width="wrap_content"-->
-<!--            android:layout_marginTop="12dp"-->
-<!--            android:id="@+id/tv_bus_rqst"-->
-<!--            android:text="$695 - Rush Full Legalization (7-14 business days)"-->
-<!--            android:textColor="@color/processing"-->
-<!--            android:layout_height="wrap_content"/>-->
+            style="@style/request_address_textview_Style"
+            android:id="@+id/tv_address_rqst"/>
 
         <androidx.appcompat.widget.AppCompatTextView
-            android:layout_width="wrap_content"
+            style="@style/request_address_textview_Style"
             android:id="@+id/tv_documents_rqst"
-            android:layout_marginTop="12dp"
-            android:fontFamily="@font/sspregular"
-            android:textSize="16sp"
-            android:text="Documents - 04"
-            android:textColor="@color/black"
-            android:layout_height="wrap_content"/>
+            android:textColor="@color/colorPrimary"/>
 
         <ImageView
             android:layout_width="match_parent"
@@ -65,25 +40,16 @@
                 android:layout_marginTop="12dp"
                 android:text="1 day ago"
                 android:fontFamily="@font/sspregular"
-                android:textSize="16sp"
+                android:textSize="14sp"
                 android:layout_centerVertical="true"
                 android:id="@+id/tv_time_rqst"
                 android:layout_marginBottom="12dp"
                 android:textColor="@color/text_color"
                 android:layout_height="wrap_content"/>
             <androidx.appcompat.widget.AppCompatTextView
-                android:layout_width="wrap_content"
-                android:layout_marginTop="12dp"
-                android:text="1 day ago"
-                android:fontFamily="@font/sspsemibold"
-                android:textSize="18sp"
-                android:layout_centerVertical="true"
+                style="@style/request_notaryname_textview_Style"
                 android:id="@+id/tv_notary_name"
-                android:layout_toLeftOf="@+id/tv_status_rqst"
-                android:layout_marginEnd="12dp"
-                android:layout_marginBottom="12dp"
-                android:textColor="@color/text_color"
-                android:layout_height="wrap_content"/>
+                android:layout_toStartOf="@+id/tv_status_rqst"/>
             <androidx.appcompat.widget.AppCompatTextView
                 android:layout_width="100dp"
                 android:layout_marginTop="12dp"

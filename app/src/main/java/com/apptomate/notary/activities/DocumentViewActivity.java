@@ -29,7 +29,7 @@ public class DocumentViewActivity extends AppCompatActivity {
 //                webView.webViewClient = WebViewClient()
 //        webView.settings.setSupportZoom(true)
 //        webView.settings.javaScriptEnabled = true
-       Bundle b= getIntent().getExtras();
+        Bundle b= getIntent().getExtras();
         if (b != null) {
             url_= b.getString("url");
         }

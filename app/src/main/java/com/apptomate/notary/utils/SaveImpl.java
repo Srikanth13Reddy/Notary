@@ -31,13 +31,13 @@ public class SaveImpl implements SavePresenter {
     }
 
     @Override
-    public void handleSave(JSONObject jsonObject, String connectionId, String type,String token)
+    public void handleSave(JSONObject jsonObject, String connectionId, String type,String token,String auth)
     {
 
-        onRegister(jsonObject, connectionId, type, token);
+        onRegister(jsonObject, connectionId, type, token,auth);
     }
 
-    private void onRegister(JSONObject jsonObject, String connectionId, String type,String token) {
+    private void onRegister(JSONObject jsonObject, String connectionId, String type,String token,String auth) {
 
         OkHttpClient myOkHttpClient = new OkHttpClient.Builder()
                 .build();
@@ -49,7 +49,7 @@ public class SaveImpl implements SavePresenter {
             request = new Request.Builder()
                     .addHeader("accept", "application/json")
                     .addHeader("content-type", "application/json")
-                   // .addHeader("Authorization", "Bearer "+token)
+                    .addHeader("Authorization", "Bearer "+auth)
                     .post(body)
                     .url(ApiConstants.BaseUrl + connectionId)
                     .build();
@@ -57,7 +57,7 @@ public class SaveImpl implements SavePresenter {
             request = new Request.Builder()
                     .addHeader("accept", "application/json")
                     .addHeader("content-type", "application/json")
-                    //.addHeader("Authorization", "Bearer "+token)
+                    .addHeader("Authorization", "Bearer "+auth)
                     .get()
                     .url(ApiConstants.BaseUrl + connectionId)
                     .build();
@@ -65,7 +65,7 @@ public class SaveImpl implements SavePresenter {
             request = new Request.Builder()
                     .addHeader("accept", "application/json")
                     .addHeader("content-type", "application/json")
-                   // .addHeader("Authorization", "Bearer "+token)
+                    .addHeader("Authorization", "Bearer "+auth)
                     .put(body)
                     .url(ApiConstants.BaseUrl + connectionId)
                     .build();

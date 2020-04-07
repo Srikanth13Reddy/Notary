@@ -20,6 +20,7 @@
             android:layout_centerVertical="true"
             android:theme="@style/SCBSwitch"
             android:checked="false"
+            android:textSize="6dp"
             android:id="@+id/sw"
             android:layout_alignParentEnd="true"
             android:layout_height="wrap_content"/>

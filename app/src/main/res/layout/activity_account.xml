@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<androidx.core.widget.NestedScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -8,6 +8,12 @@
     android:background="@color/white"
     android:layout_height="match_parent"
     tools:context=".activities.AccountActivity">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:orientation="vertical"
+        android:layout_height="match_parent">
+
+
     <RelativeLayout
         android:layout_width="match_parent"
         android:padding="12dp"
@@ -17,7 +23,7 @@
 
         <androidx.appcompat.widget.AppCompatTextView
             android:layout_width="wrap_content"
-            android:text="Change Password"
+            android:text="@string/change_password"
             android:textColor="@color/black"
             android:textSize="20sp"
             android:fontFamily="@font/sspregular"
@@ -50,64 +56,75 @@
         android:id="@+id/change_pass_ll"
         android:orientation="vertical"
         android:layout_height="wrap_content">
-        <androidx.appcompat.widget.AppCompatEditText
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:hint="Old Password"
-            android:textColorHint="@color/black"
+            android:layout_marginTop="24dp"
+            android:layout_height="wrap_content">
+        <androidx.appcompat.widget.AppCompatEditText
+            style="@style/editText_Style"
+            android:hint="@string/old_password"
+            android:textColorHint="@color/border_color"
             android:inputType="textPassword"
-            android:textColor="@color/black"
             android:layout_marginEnd="12dp"
             android:layout_marginStart="12dp"
-            android:padding="12dp"
             android:fontFamily="@font/sspregular"
-            android:id="@+id/act_old_ps"
-            android:background="@drawable/edittext_drawable"
-            android:layout_height="wrap_content"/>
-        <androidx.appcompat.widget.AppCompatEditText
-            android:layout_width="match_parent"
-            android:hint="New Password"
-            android:layout_marginEnd="12dp"
-            android:layout_marginStart="12dp"
-            android:layout_marginTop="12dp"
-            android:textColorHint="@color/black"
-            android:inputType="textPassword"
-            android:textColor="@color/black"
-            android:padding="12dp"
-            android:fontFamily="@font/sspregular"
-            android:id="@+id/act_new_ps"
-            android:background="@drawable/edittext_drawable"
-            android:layout_height="wrap_content"/>
-        <androidx.appcompat.widget.AppCompatEditText
-            android:layout_width="match_parent"
-            android:hint="Confirm Password"
-            android:layout_marginEnd="12dp"
-            android:layout_marginStart="12dp"
-            android:layout_marginTop="12dp"
-            android:textColorHint="@color/black"
-            android:inputType="textPassword"
-            android:textColor="@color/black"
-            android:padding="12dp"
-            android:fontFamily="@font/sspregular"
-            android:id="@+id/act_confirm_ps"
-            android:background="@drawable/edittext_drawable"
-            android:layout_height="wrap_content"/>
+            android:id="@+id/act_old_ps"/>
 
-        <Button
+            <CheckBox
+                 style="@style/checkbox_Style"
+                android:layout_marginEnd="24dp"
+                android:id="@+id/act_old_ps_check"/>
+        </RelativeLayout>
+
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_marginTop="12dp"
+            android:layout_height="wrap_content">
+        <androidx.appcompat.widget.AppCompatEditText
+            style="@style/editText_Style"
+            android:hint="@string/new_password"
+            android:layout_marginEnd="12dp"
+            android:layout_marginStart="12dp"
+            android:textColorHint="@color/border_color"
+            android:inputType="textPassword"
+            android:id="@+id/act_new_ps"/>
+            <CheckBox
+                android:id="@+id/act_new_ps_check"
+                 style="@style/checkbox_Style"
+                android:layout_marginEnd="24dp" />
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_marginTop="12dp"
+            android:layout_height="wrap_content">
+        <androidx.appcompat.widget.AppCompatEditText
+            style="@style/editText_Style"
+            android:hint="@string/confirm_password"
+            android:layout_marginEnd="12dp"
+            android:layout_marginStart="12dp"
+            android:textColorHint="@color/border_color"
+            android:inputType="textPassword"
+            android:id="@+id/act_confirm_ps"/>
+            <CheckBox
+                android:id="@+id/act_confirm_ps_check"
+                 style="@style/checkbox_Style"
+                android:layout_marginEnd="24dp" />
+        </RelativeLayout>
+
+        <androidx.appcompat.widget.AppCompatButton
             android:layout_width="150dp"
             style="@style/Button_Style"
             android:layout_marginTop="48dp"
             android:text="Save"
+            android:onClick="savePass"
+            android:id="@+id/acct_save_pass"
             android:layout_height="wrap_content"/>
 
     </LinearLayout>
 
-    <View
-        android:layout_width="match_parent"
-        android:background="@color/border_color"
-        android:layout_marginStart="16sp"
-        android:layout_marginEnd="16sp"
-        android:layout_marginTop="12dp"
-        android:layout_height="0.5dp"/>
+    <View style="@style/view_Style"/>
 
 
 
@@ -139,7 +156,7 @@
             android:visibility="gone"
             android:id="@+id/iv_down_p"
             android:layout_alignParentEnd="true"
-            android:src="@drawable/down_arrow"
+            android:src="@drawable/up_arrow"
             android:layout_centerVertical="true"
             android:layout_height="24dp"/>
 
@@ -154,47 +171,20 @@
         android:orientation="vertical"
         android:layout_height="wrap_content">
         <androidx.appcompat.widget.AppCompatEditText
-            android:layout_width="match_parent"
-            android:hint="Old Password"
-            android:textColorHint="@color/black"
-            android:inputType="textPassword"
-            android:textColor="@color/black"
+            style="@style/editText_Style"
+            android:hint="@string/enter_new_phone_number"
+            android:textColorHint="@color/border_color"
+            android:inputType="phone"
             android:layout_marginEnd="12dp"
-            android:layout_marginStart="12dp"
-            android:padding="12dp"
-            android:fontFamily="@font/sspregular"
-            android:background="@drawable/edittext_drawable"
-            android:layout_height="wrap_content"/>
-        <androidx.appcompat.widget.AppCompatEditText
-            android:layout_width="match_parent"
-            android:hint="New Password"
-            android:layout_marginEnd="12dp"
-            android:layout_marginStart="12dp"
-            android:layout_marginTop="12dp"
-            android:textColorHint="@color/black"
-            android:inputType="textPassword"
-            android:textColor="@color/black"
-            android:padding="12dp"
-            android:fontFamily="@font/sspregular"
-            android:background="@drawable/edittext_drawable"
-            android:layout_height="wrap_content"/>
-        <androidx.appcompat.widget.AppCompatEditText
-            android:layout_width="match_parent"
-            android:hint="Confirm Password"
-            android:layout_marginEnd="12dp"
-            android:layout_marginStart="12dp"
-            android:layout_marginTop="12dp"
-            android:textColorHint="@color/black"
-            android:inputType="textPassword"
-            android:textColor="@color/black"
-            android:padding="12dp"
-            android:fontFamily="@font/sspregular"
-            android:background="@drawable/edittext_drawable"
-            android:layout_height="wrap_content"/>
+            android:id="@+id/act_phone"
+            android:layout_marginStart="12dp"/>
+
 
         <Button
             android:layout_width="150dp"
+            android:onClick="phoneSave"
             style="@style/Button_Style"
+            android:id="@+id/act_phone_btn"
             android:layout_marginTop="48dp"
             android:text="Save"
             android:layout_height="wrap_content"/>
@@ -202,12 +192,7 @@
     </LinearLayout>
 
     <View
-        android:layout_width="match_parent"
-        android:background="@color/border_color"
-        android:layout_marginStart="16sp"
-        android:layout_marginEnd="16sp"
-        android:layout_marginTop="12dp"
-        android:layout_height="0.5dp"/>
+       style="@style/view_Style"/>
 
 
     <RelativeLayout
@@ -219,7 +204,7 @@
 
         <androidx.appcompat.widget.AppCompatTextView
             android:layout_width="wrap_content"
-            android:text="Change Address"
+            android:text="@string/change_address"
             android:textColor="@color/black"
             android:textSize="20sp"
             android:fontFamily="@font/sspregular"
@@ -238,7 +223,7 @@
             android:visibility="gone"
             android:id="@+id/iv_down_ad"
             android:layout_alignParentEnd="true"
-            android:src="@drawable/down_arrow"
+            android:src="@drawable/up_arrow"
             android:layout_centerVertical="true"
             android:layout_height="24dp"/>
 
@@ -247,66 +232,86 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:padding="12dp"
-        android:visibility="gone"
         android:gravity="center"
+        android:visibility="gone"
         android:id="@+id/change_address_ll"
         android:orientation="vertical"
         android:layout_height="wrap_content">
         <androidx.appcompat.widget.AppCompatEditText
-            android:layout_width="match_parent"
-            android:hint="Old Password"
-            android:textColorHint="@color/black"
-            android:inputType="textPassword"
-            android:textColor="@color/black"
+            style="@style/editText_Style"
+            android:hint="@string/street"
+            android:textColorHint="@color/border_color"
+            android:inputType="text"
+            android:id="@+id/et_street"
+            android:layout_marginEnd="12dp"
+            android:layout_marginStart="12dp"/>
+        <androidx.appcompat.widget.AppCompatEditText
+            style="@style/editText_Style"
+            android:hint="@string/apartment"
             android:layout_marginEnd="12dp"
             android:layout_marginStart="12dp"
-            android:padding="12dp"
-            android:fontFamily="@font/sspregular"
-            android:background="@drawable/edittext_drawable"
-            android:layout_height="wrap_content"/>
+            android:id="@+id/et_apartment"
+            android:layout_marginTop="12dp"
+            android:textColorHint="@color/border_color"
+            android:inputType="text"/>
         <androidx.appcompat.widget.AppCompatEditText
+            style="@style/editText_Style"
             android:layout_width="match_parent"
-            android:hint="New Password"
+            android:hint="@string/city"
             android:layout_marginEnd="12dp"
             android:layout_marginStart="12dp"
             android:layout_marginTop="12dp"
-            android:textColorHint="@color/black"
-            android:inputType="textPassword"
-            android:textColor="@color/black"
-            android:padding="12dp"
-            android:fontFamily="@font/sspregular"
-            android:background="@drawable/edittext_drawable"
-            android:layout_height="wrap_content"/>
+            android:id="@+id/et_city"
+            android:textColorHint="@color/border_color"
+            android:inputType="text"/>
         <androidx.appcompat.widget.AppCompatEditText
+            style="@style/editText_Style"
             android:layout_width="match_parent"
-            android:hint="Confirm Password"
+            android:hint="@string/country"
+            android:drawableRight="@drawable/ic_keyboard_arrow_down_black_24dp"
             android:layout_marginEnd="12dp"
             android:layout_marginStart="12dp"
             android:layout_marginTop="12dp"
-            android:textColorHint="@color/black"
-            android:inputType="textPassword"
-            android:textColor="@color/black"
-            android:padding="12dp"
-            android:fontFamily="@font/sspregular"
-            android:background="@drawable/edittext_drawable"
-            android:layout_height="wrap_content"/>
+            android:id="@+id/et_country"
+            android:textColorHint="@color/border_color"
+            android:inputType="text"
+            android:focusable="false"/>
+
+        <androidx.appcompat.widget.AppCompatEditText
+            style="@style/editText_Style"
+            android:layout_width="match_parent"
+            android:hint="@string/state"
+            android:drawableRight="@drawable/ic_keyboard_arrow_down_black_24dp"
+            android:layout_marginEnd="12dp"
+            android:layout_marginStart="12dp"
+            android:id="@+id/et_state"
+            android:layout_marginTop="12dp"
+            android:textColorHint="@color/border_color"
+            android:inputType="text"
+            android:focusable="false"/>
+        <androidx.appcompat.widget.AppCompatEditText
+            style="@style/editText_Style"
+            android:hint="@string/postal_code"
+            android:layout_marginEnd="12dp"
+            android:layout_marginStart="12dp"
+            android:id="@+id/et_postalcode"
+            android:layout_marginTop="12dp"
+            android:textColorHint="@color/border_color"
+            android:inputType="number"/>
+
 
         <Button
             android:layout_width="150dp"
             style="@style/Button_Style"
             android:layout_marginTop="48dp"
-            android:text="Save"
+            android:text="@string/save"
+            android:onClick="changeAddress"
             android:layout_height="wrap_content"/>
 
     </LinearLayout>
 
     <View
-        android:layout_width="match_parent"
-        android:background="@color/border_color"
-        android:layout_marginStart="16sp"
-        android:layout_marginEnd="16sp"
-        android:layout_marginTop="12dp"
-        android:layout_height="0.5dp"/>
+        style="@style/view_Style"/>
 
-
-</LinearLayout>
+    </LinearLayout>
+</androidx.core.widget.NestedScrollView>

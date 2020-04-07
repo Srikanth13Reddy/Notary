@@ -13,16 +13,9 @@
         android:layout_height="match_parent"/>
 
     <androidx.appcompat.widget.AppCompatTextView
-        android:layout_width="wrap_content"
-        android:layout_centerVertical="true"
-        android:layout_centerHorizontal="true"
-        android:text="No Pending Documents"
-        android:fontFamily="@font/sspregular"
-        android:textSize="20sp"
-        android:visibility="gone"
-        android:id="@+id/tv_pen_notfound"
-        android:textColor="@color/colorPrimary"
-        android:layout_height="wrap_content"/>
+        style="@style/notfound_textview_Style"
+        android:text="@string/no_pending_documents"
+        android:id="@+id/tv_pen_notfound"/>
 
     <include layout="@layout/notfound"/>
 

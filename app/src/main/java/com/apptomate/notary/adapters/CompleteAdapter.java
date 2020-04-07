@@ -7,20 +7,17 @@ import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.AppCompatTextView;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.apptomate.notary.R;
 import com.apptomate.notary.activities.ClientInfo;
 import com.apptomate.notary.models.RequestModel;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-
 import java.util.ArrayList;
 import java.util.Locale;
+
+import static com.apptomate.notary.utils.ApiConstants.time;
+import static com.apptomate.notary.utils.ApiConstants.toTitleCase;
 
 
 public class CompleteAdapter extends RecyclerView.Adapter<CompleteAdapter.MyHolder>
@@ -58,11 +55,14 @@ public class CompleteAdapter extends RecyclerView.Adapter<CompleteAdapter.MyHold
 
         if (imageModelArrayList.get(position)!=null)
         {
+
             RequestModel obj=imageModelArrayList.get(position);
+            holder.tv_time_rqst.setText(time(obj.getRequestedDate()));
             holder.tv_documents_com.setText("Documents - "+obj.getDocumentsCount());
             holder.tv_address_com.setText(obj.getFullAddress());
-            holder.name_tv_com.setText(obj.getName());
-            holder.tv_notary_name.setText(obj.getAssignedToName());
+            holder.name_tv_com.setText(toTitleCase(obj.getName()));
+           // holder.tv_notary_name.setText(obj.getAssignedToName());
+            holder.tv_notary_name.setText(toTitleCase(obj.getAssignedToName()));
             holder.itemView.setOnClickListener(v -> {
                 Intent i=new Intent(context, ClientInfo.class);
                 i.putExtra("rId",obj.getUserRequestDetailsId());
