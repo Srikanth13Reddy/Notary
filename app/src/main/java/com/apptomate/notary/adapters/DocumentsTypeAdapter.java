@@ -81,7 +81,7 @@ public class DocumentsTypeAdapter extends BaseAdapter
             aSwitch.setChecked(true);
         }
 
-        if (status.equalsIgnoreCase("Completed"))
+        if (status.equalsIgnoreCase("Completed")||status.equalsIgnoreCase("Rejected"))
         {
             aSwitch.setClickable(false);
         }

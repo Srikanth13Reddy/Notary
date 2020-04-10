@@ -45,7 +45,7 @@ public class NotaryListAdapter extends RecyclerView.Adapter<NotaryListAdapter.My
     String id;
     private String token;
 
-    public NotaryListAdapter(ArrayList<NotaryListModel> arrayList, Context context, String id, String rId,String token) {
+    public NotaryListAdapter(ArrayList<NotaryListModel> arrayList, Context context, String rId, String id,String token) {
         this.arrayList = arrayList;
         this.context = context;
         this.rId=rId;
@@ -78,7 +78,7 @@ public class NotaryListAdapter extends RecyclerView.Adapter<NotaryListAdapter.My
             }
 
         }
-        holder.tv_n_name.setText(arrayList.get(position).getName());
+        holder.tv_n_name.setText(ApiConstants.toTitleCase(arrayList.get(position).getName()));
         holder.iv_send.setOnClickListener(v -> {
             AlertDialog.Builder alb=new AlertDialog.Builder(context);
             alb.setTitle("Confirmation");
@@ -135,7 +135,8 @@ public class NotaryListAdapter extends RecyclerView.Adapter<NotaryListAdapter.My
 
         final String requestBody=js.toString();
         RequestQueue requestQueue= Volley.newRequestQueue(context);
-        StringRequest stringRequest= new StringRequest(Request.Method.PATCH, ApiConstants.BaseUrl + "/request?requestId="+rId, response -> {
+        StringRequest stringRequest= new StringRequest(Request.Method.PATCH, ApiConstants.BaseUrl + "/request?requestId="+rId,
+                response -> {
             progressDialog.dismiss();
             Log.e("ResponseStatus",response);
             try {
@@ -143,12 +144,12 @@ public class NotaryListAdapter extends RecyclerView.Adapter<NotaryListAdapter.My
                 String status= js1.optString("status");
                 if (status.equalsIgnoreCase("Success"))
                 {
-                    Toast.makeText(context, ""+js.optString("message"), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, ""+js1.optString("message"), Toast.LENGTH_SHORT).show();
                    NotariesListActivity activity= (NotariesListActivity)context;
                    activity.finish();
                 }
                 else {
-                    Toast.makeText(context, ""+js.optString("message"), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, ""+js1.optString("message"), Toast.LENGTH_SHORT).show();
                 }
             } catch (JSONException e) {
                 e.printStackTrace();

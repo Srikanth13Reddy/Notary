@@ -11,6 +11,15 @@ public class NotaryListModel
     String roleName;
     String stateName;
     String countryName;
+    String fullAddress;
+
+    public String getFullAddress() {
+        return fullAddress;
+    }
+
+    public void setFullAddress(String fullAddress) {
+        this.fullAddress = fullAddress;
+    }
 
     public String getSaasUserId() {
         return saasUserId;

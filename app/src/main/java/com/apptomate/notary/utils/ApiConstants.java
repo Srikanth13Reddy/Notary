@@ -1,8 +1,10 @@
 package com.apptomate.notary.utils;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.text.format.DateUtils;
 import android.util.Pair;
 import android.widget.Toast;
@@ -16,6 +18,8 @@ import com.android.volley.Response;
 import com.android.volley.ServerError;
 import com.android.volley.TimeoutError;
 import com.android.volley.VolleyError;
+import com.apptomate.notary.activities.LoginActivity;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.TimeZone;
@@ -93,6 +97,20 @@ public class ApiConstants
             Toast.makeText(context, "Server error", Toast.LENGTH_SHORT).show();
             // Indicates that the server response could not be parsed
         }
+        else if (error instanceof AuthFailureError)
+        {
+            logOut(context);
+           // Toast.makeText(context, "Session out please Login", Toast.LENGTH_SHORT).show();
+           // new SharedPrefs(context).logOut();
+//            Intent i=new Intent(context, LoginActivity.class);
+//            context.startActivity(i);
+        }
+    }
+
+    public static void logOut(Context context)
+    {
+        Toast.makeText(context, "Session out please Login", Toast.LENGTH_SHORT).show();
+        new SharedPrefs(context).logOut();
     }
 
 }

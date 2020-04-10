@@ -5,6 +5,15 @@ public class StateModel
     String stateId;
     String stateName;
     String countryId;
+    private boolean isSelected;
+
+    public boolean getSelected() {
+        return isSelected;
+    }
+
+    public void setSelected(boolean selected) {
+        isSelected = selected;
+    }
 
     public String getStateId() {
         return stateId;

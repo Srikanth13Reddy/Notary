@@ -1,22 +1,25 @@
 package com.apptomate.notary.activities;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.AppCompatTextView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.MenuItem;
-import android.widget.Toast;
+import android.view.View;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
+import com.android.volley.toolbox.StringRequest;
 import com.apptomate.notary.R;
 import com.apptomate.notary.adapters.NotaryListAdapter;
-import com.apptomate.notary.interfaces.SaveView;
+import com.apptomate.notary.adapters.NotaryMembersAdapter;
 import com.apptomate.notary.models.NotaryListModel;
 import com.apptomate.notary.utils.ApiConstants;
-import com.apptomate.notary.utils.SaveImpl;
+import com.apptomate.notary.utils.MySingleton;
 import com.apptomate.notary.utils.SharedPrefs;
 
 import org.json.JSONArray;
@@ -24,37 +27,60 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 
-public class NotariesListActivity extends AppCompatActivity implements SaveView
-{
+public class NotaryMembersActivity extends AppCompatActivity {
+
     SharedPrefs sharedPrefs;
-    String id,agencyId;
     ProgressDialog progressDialog;
-    RecyclerView rv_notary;
-    String rId;
-    private String token;
+    String id,token,roleId,agencyId;
+    AppCompatTextView tv_notary_notfound;
+    RecyclerView rv_ntary;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_notaries_list);
+        setContentView(R.layout.activity_notary_members);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setTitle("Notary");
-        Bundle b= getIntent().getExtras();
-        if (b != null) {
-            rId= b.getString("rId");
-        }
-        rv_notary=findViewById(R.id.rv_notary);
-        rv_notary.setLayoutManager(new LinearLayoutManager(this));
-        progressDialog= ApiConstants.showProgressDialog(this,"Please wait....");
+        getSupportActionBar().setTitle("Member");
+        findViews();
         getLoginData();
-        getData();
+
+
     }
 
-    private void getData()
+    private void findViews()
+    {
+        progressDialog=ApiConstants.showProgressDialog(this,"Please wait...");
+        rv_ntary= findViewById(R.id.rv_notarymember);
+        tv_notary_notfound= findViewById(R.id.tv_notary_notfound);
+        rv_ntary.setLayoutManager(new LinearLayoutManager(this));
+    }
+
+    void notaryListCount()
     {
         progressDialog.show();
-        new SaveImpl(this).handleSave(new JSONObject(),"agencynotaries?agencyId="+agencyId,"GET","",token);
+         StringRequest stringRequest=new StringRequest(Request.Method.GET, ApiConstants.BaseUrl +"agencynotaries?agencyId="+agencyId, response -> {
+            progressDialog.dismiss();
+            assignData(response);
+           Log.e("Res",response);
+
+        }, error -> {
+            progressDialog.dismiss();
+            ApiConstants.parseVolleyError(NotaryMembersActivity.this,error);
+        })
+        {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError
+            {
+                HashMap<String,String> hm=new HashMap<>();
+                hm.put("Authorization","Bearer "+token);
+                return hm;
+            }
+        };
+        MySingleton.getInstance(this).addToRequestQueue(stringRequest);
     }
 
     private void getLoginData()
@@ -63,29 +89,19 @@ public class NotariesListActivity extends AppCompatActivity implements SaveView
         try {
             if (sharedPrefs.getLoginData().get(SharedPrefs.LOGIN_DATA)!=null)
             {
-                JSONObject js=new JSONObject(sharedPrefs.getLoginData().get(SharedPrefs.LOGIN_DATA));
+                JSONObject js=new JSONObject(Objects.requireNonNull(sharedPrefs.getLoginData().get(SharedPrefs.LOGIN_DATA)));
                 id= js.optString("id");
                 token= js.optString("token");
+                roleId= js.optString("roleId");
                 agencyId= js.optString("agencyId");
+                notaryListCount();
             }
 
         } catch (JSONException e) {
             e.printStackTrace();
         }
-    }
 
-    @Override
-    public void onSaveSucess(String code, String response, String type)
-    {
-       progressDialog.dismiss();
-        Log.e("Noaries",response);
-        if (code.equalsIgnoreCase("200"))
-        {
-            assignData(response);
-        }else if (code.equalsIgnoreCase("401"))
-        {
-            ApiConstants.logOut(this);
-        }
+
     }
 
     private void assignData(String response)
@@ -93,9 +109,15 @@ public class NotariesListActivity extends AppCompatActivity implements SaveView
         ArrayList<NotaryListModel> arrayList=new ArrayList<>();
         try {
             JSONArray ja=new JSONArray(response);
+            if (ja.length()==0)
+            {
+                tv_notary_notfound.setVisibility(View.VISIBLE);
+            }else {
+                tv_notary_notfound.setVisibility(View.GONE);
+            }
             for (int i=0;i<ja.length();i++)
             {
-               JSONObject json= ja.getJSONObject(i);
+                JSONObject json= ja.getJSONObject(i);
                 String saasUserId= json.optString("saasUserId");
                 String roleId= json.optString("roleId");
                 String profileImage= json.optString("profileImage");
@@ -105,6 +127,7 @@ public class NotariesListActivity extends AppCompatActivity implements SaveView
                 String roleName= json.optString("roleName");
                 String stateName= json.optString("stateName");
                 String countryName= json.optString("countryName");
+                String fullAddress= json.optString("fullAddress");
                 NotaryListModel notaryListModel=new NotaryListModel();
                 notaryListModel.setSaasUserId(saasUserId);
                 notaryListModel.setRoleId(roleId);
@@ -115,36 +138,14 @@ public class NotariesListActivity extends AppCompatActivity implements SaveView
                 notaryListModel.setRoleName(roleName);
                 notaryListModel.setStateName(stateName);
                 notaryListModel.setCountryName(countryName);
+                notaryListModel.setFullAddress(fullAddress);
                 arrayList.add(notaryListModel);
 
             }
-            NotaryListAdapter notaryListAdapter=new NotaryListAdapter(arrayList,this,rId,id,token);
-            rv_notary.setAdapter(notaryListAdapter);
+            NotaryMembersAdapter notaryListAdapter=new NotaryMembersAdapter(arrayList,this);
+            rv_ntary.setAdapter(notaryListAdapter);
         } catch (JSONException e) {
             e.printStackTrace();
         }
-    }
-
-    @Override
-    public void onSaveFailure(String error) {
-        progressDialog.dismiss();
-        Log.e("Noaries",error);
-        Toast.makeText(this, ""+error, Toast.LENGTH_SHORT).show();
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item)
-    {
-        if (item.getItemId()==android.R.id.home)
-        {
-            onBackPressed();
-        }
-        return super.onOptionsItemSelected(item);
-    }
-    @Override
-    public void onBackPressed()
-    {
-        super.onBackPressed();
-        overridePendingTransition(R.anim.left_in, R.anim.right_out);
     }
 }

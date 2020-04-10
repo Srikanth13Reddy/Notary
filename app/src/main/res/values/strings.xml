@@ -42,5 +42,6 @@
     <string name="inprogress">Inprogress</string>
     <string name="pending">Pending</string>
     <string name="completed">Completed</string>
+    <string name="read_all">Read All</string>
 
 </resources>

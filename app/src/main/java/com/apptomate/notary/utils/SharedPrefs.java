@@ -1,7 +1,10 @@
 package com.apptomate.notary.utils;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+
+import com.apptomate.notary.activities.LoginActivity;
 
 import java.util.HashMap;
 
@@ -51,6 +54,8 @@ public class SharedPrefs
     {
         editor.clear();
         editor.commit();
+        Intent i=new Intent(context, LoginActivity.class);
+        context.startActivity(i);
     }
 
 

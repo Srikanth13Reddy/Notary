@@ -13,8 +13,10 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
@@ -59,6 +61,10 @@ public class HomeActivity extends AppCompatActivity implements SaveView
     private boolean doubleBackToExitPressedOnce=false;
     AppCompatTextView tv_not_count;
     private String token;
+    private String roleId;
+    RelativeLayout rl_notary;
+    AppCompatTextView tv_notary_count;
+    private String agencyId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -123,11 +129,26 @@ public class HomeActivity extends AppCompatActivity implements SaveView
                 JSONObject js=new JSONObject(Objects.requireNonNull(sharedPrefs.getLoginData().get(SharedPrefs.LOGIN_DATA)));
                 id= js.optString("id");
                 token= js.optString("token");
+                roleId= js.optString("roleId");
+                agencyId= js.optString("agencyId");
+                if (roleId.equalsIgnoreCase("1"))
+                {
+                    notaryListCount();
+                }
+                Log.e("LoginResponse",sharedPrefs.getLoginData().get(SharedPrefs.LOGIN_DATA));
+                if (roleId!=null&&roleId.equalsIgnoreCase("1"))
+                {
+                    rl_notary.setVisibility(View.VISIBLE);
+                }else {
+                    rl_notary.setVisibility(View.GONE);
+                }
             }
 
         } catch (JSONException e) {
             e.printStackTrace();
         }
+
+
     }
 
     private void findViews()
@@ -145,11 +166,22 @@ public class HomeActivity extends AppCompatActivity implements SaveView
         } catch (JSONException e) {
             e.printStackTrace();
         }
+        tv_notary_count=findViewById(R.id.tv_notary_count);
+        rl_notary=findViewById(R.id.rv_notary);
         tv_name=findViewById(R.id.tv_name_home);
         tv_not_count=findViewById(R.id.not_count);
         tv_count=findViewById(R.id.tv_count);
         tv_name.setText(toTitleCase(name));
         tv_not_count.setVisibility(View.GONE);
+        rl_notary.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i=new Intent(HomeActivity.this,NotaryMembersActivity.class);
+                startActivity(i);
+                overridePendingTransition(R.anim.right_in, R.anim.left_out);
+            }
+        });
+
     }
 
     public void notification(View view) {
@@ -373,6 +405,41 @@ public class HomeActivity extends AppCompatActivity implements SaveView
                 }
             }
         }
+    }
+
+    void notaryListCount()
+    {
+        progressDialog.show();
+        @SuppressLint("SetTextI18n") StringRequest stringRequest=new StringRequest(Request.Method.GET, ApiConstants.BaseUrl +"agencynotaries?agencyId="+agencyId, response -> {
+            progressDialog.dismiss();
+            try {
+                JSONArray ja=new JSONArray(response);
+                tv_notary_count.setText(""+ja.length());
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+        }, error -> {
+            progressDialog.dismiss();
+            ApiConstants.parseVolleyError(HomeActivity.this,error);
+        })
+        {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError
+            {
+                HashMap<String,String> hm=new HashMap<>();
+                hm.put("Authorization","Bearer "+token);
+                return hm;
+            }
+        };
+        MySingleton.getInstance(this).addToRequestQueue(stringRequest);
+    }
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        getNotificationCount();
     }
     //onActivityResult
 }

@@ -66,6 +66,7 @@ public class InprogressAdapter extends RecyclerView.Adapter<InprogressAdapter.My
                 Intent i=new Intent(context, ClientInfo.class);
                 i.putExtra("rId",obj.getUserRequestDetailsId());
                 i.putExtra("status",obj.getStatus());
+                i.putExtra("notary",obj.getAssignedToName());
                 context.startActivity(i);
                 Activity mContext = (Activity) context;
                 mContext.overridePendingTransition(R.anim.right_in, R.anim.left_out);

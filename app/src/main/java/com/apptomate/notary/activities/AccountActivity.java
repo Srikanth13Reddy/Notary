@@ -795,6 +795,9 @@ public class AccountActivity extends AppCompatActivity implements CountryAdapter
             } catch (JSONException e) {
                 e.printStackTrace();
             }
+        }else if (code.equalsIgnoreCase("401"))
+        {
+            ApiConstants.logOut(this);
         }
     }
 

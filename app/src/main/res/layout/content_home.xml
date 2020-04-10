@@ -72,6 +72,36 @@
                     android:textColor="@color/colorPrimaryDark"
                     android:layout_height="wrap_content"/>
             </RelativeLayout>
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_marginTop="24dp"
+                android:id="@+id/rv_notary"
+                android:visibility="gone"
+                android:background="@drawable/main_edit_text"
+                android:layout_height="50dp">
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:text="Your Notary Team Members"
+                    android:layout_marginStart="12dp"
+                    android:textSize="18dp"
+                    android:fontFamily="@font/sspbold"
+                    android:layout_marginEnd="12dp"
+                    android:textColor="@color/colorPrimaryDark"
+                    android:layout_height="wrap_content"/>
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:text="0"
+                    android:layout_marginStart="12dp"
+                    android:textSize="18dp"
+                    android:id="@+id/tv_notary_count"
+                    android:layout_marginEnd="12dp"
+                    android:fontFamily="@font/sspbold"
+                    android:layout_alignParentEnd="true"
+                    android:textColor="@color/colorPrimaryDark"
+                    android:layout_height="wrap_content"/>
+            </RelativeLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"

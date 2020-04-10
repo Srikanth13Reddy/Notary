@@ -16,9 +16,12 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.text.SpannableString;
+import android.text.style.ForegroundColorSpan;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -81,7 +84,9 @@ public class ClientInfo extends AppCompatActivity implements SaveView , PopupMen
     AppCompatImageView edit_iv_status;
     private long downloadID;
     ProgressDialog progressDialog_;
-
+    String assignToName;
+    ArrayList<String> unverified=new ArrayList<>();
+    ArrayList<String> verified=new ArrayList<>();
     private BroadcastReceiver onDownloadComplete = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -113,6 +118,7 @@ public class ClientInfo extends AppCompatActivity implements SaveView , PopupMen
         if (b != null) {
             rId= b.getString("rId");
             status= b.getString("status");
+            assignToName=b.getString("notary");
             getRequestData();
         }
 
@@ -135,12 +141,17 @@ public class ClientInfo extends AppCompatActivity implements SaveView , PopupMen
 
     private void visibleViews()
     {
-        if (roleId.equalsIgnoreCase("1")&&status.equalsIgnoreCase("New"))
+        if (roleId!=null&&roleId.equalsIgnoreCase("1")&&status.equalsIgnoreCase("New")&&assignToName.isEmpty())
         {
             tv_assign_.setVisibility(View.VISIBLE);
             tv_assign_.setText("Assign");
         }
-        else if (roleId.equalsIgnoreCase("1")&&status.equalsIgnoreCase("Pending"))
+        else if (roleId!=null&&roleId.equalsIgnoreCase("1")&&status.equalsIgnoreCase("Pending"))
+        {
+            tv_assign_.setVisibility(View.VISIBLE);
+            tv_assign_.setText("Re Assign");
+        }
+        else if (roleId!=null&&roleId.equalsIgnoreCase("1")&&status.equalsIgnoreCase("New")&&!assignToName.isEmpty())
         {
             tv_assign_.setVisibility(View.VISIBLE);
             tv_assign_.setText("Re Assign");
@@ -151,10 +162,14 @@ public class ClientInfo extends AppCompatActivity implements SaveView , PopupMen
 
         if (status.equalsIgnoreCase("Completed")||status.equalsIgnoreCase("Rejected"))
         {
-            edit_iv_status.setVisibility(View.GONE);
+           // edit_iv_status.setVisibility(View.GONE);
+            edit_iv_status.setEnabled(false);
+            edit_iv_status.setImageResource(R.drawable.edit_);
         }
         else {
-            edit_iv_status.setVisibility(View.VISIBLE);
+            edit_iv_status.setEnabled(true);
+            edit_iv_status.setImageResource(R.drawable.edit);
+           // edit_iv_status.setVisibility(View.VISIBLE);
         }
     }
 
@@ -175,7 +190,6 @@ public class ClientInfo extends AppCompatActivity implements SaveView , PopupMen
             e.printStackTrace();
         }
     }
-
     private void findViews()
     {
         lv_documents= findViewById(R.id.lv_documents);
@@ -208,6 +222,8 @@ public class ClientInfo extends AppCompatActivity implements SaveView , PopupMen
         }
         return true;
     }
+
+
     @Override
     public void onBackPressed()
     {
@@ -223,6 +239,8 @@ public class ClientInfo extends AppCompatActivity implements SaveView , PopupMen
         Log.e("requestbyid",response);
         ArrayList<DocumentsModel> arrayList=new ArrayList<>();
         ArrayList<DocumentsDetailsModel> arrayList1=new ArrayList<>();
+        verified.clear();
+        unverified.clear();
 
         if (code.equalsIgnoreCase("200"))
         {
@@ -245,6 +263,14 @@ public class ClientInfo extends AppCompatActivity implements SaveView , PopupMen
                     String documentName= json.optString("documentName");
                     String stateName= json.optString("stateName");
                     String status= json.optString("status");
+                    if (status.equalsIgnoreCase("Unverified"))
+                    {
+                        unverified.add(status);
+                    }else if (status.equalsIgnoreCase("Verified"))
+                    {
+                        verified.add(status);
+                    }
+
                     DocumentsDetailsModel detailsModel=new DocumentsDetailsModel();
                     detailsModel.setDocumentDetailsId(documentDetailsId);
                     detailsModel.setServiceName(serviceName);
@@ -355,6 +381,22 @@ public class ClientInfo extends AppCompatActivity implements SaveView , PopupMen
         MenuItem complete= popupmenu.findItem(R.id.complete);
         MenuItem progress= popupmenu.findItem(R.id.progress);
         MenuItem pending= popupmenu.findItem(R.id.pending);
+
+
+        SpannableString s = new SpannableString("Reject");
+        s.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.red)), 0, s.length(), 0);
+        rejected.setTitle(s);
+        SpannableString s1 = new SpannableString("Pending");
+        s1.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.pending)), 0, s1.length(), 0);
+        pending.setTitle(s1);
+        SpannableString s2 = new SpannableString("Inprogress");
+        s2.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.processing)), 0, s2.length(), 0);
+        progress.setTitle(s2);
+        SpannableString s3 = new SpannableString("Complete");
+        s3.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.completed)), 0, s3.length(), 0);
+        complete.setTitle(s3);
+
+
        if (status.equalsIgnoreCase("New"))
        {
           rejected.setVisible(true);
@@ -410,24 +452,64 @@ public class ClientInfo extends AppCompatActivity implements SaveView , PopupMen
         {
             case R.id.rejected:
                 // do your code
-                showTextDialog("Rejected");
+
+                if (unverified.size()>0)
+                {
+                    showTextDialog("Rejected");
+                }else {
+                    showAlertDialogPending();
+                }
 
                 return true;
             case R.id.pending:
                 // do your code
-                showTextDialog("Pending");
+
+
+                if (unverified.size()>0)
+                {
+                    showTextDialog("Pending");
+                }else {
+                    showAlertDialogPending();
+                }
+
                 return true;
             case R.id.progress:
                 // do your code
-                changeStatus("Inprogress","");
+
+                if (unverified.size()==0)
+                {
+                    changeStatus("Inprogress","");
+                }else {
+                    showAlertDialog();
+                }
                 return true;
             case R.id.complete:
                 // do your code
-                changeStatus("Completed","");
+                if (unverified.size()==0)
+                {
+                    changeStatus("Completed","");
+                }else {
+                    showAlertDialog();
+                }
+
                 return true;
             default:
                 return false;
         }
+    }
+
+    private void showAlertDialog()
+    {
+        AlertDialog.Builder alb=new AlertDialog.Builder(this);
+        alb.setMessage("Please Verify Documents");
+        alb.create().show();
+    }
+
+    private void showAlertDialogPending()
+    {
+        AlertDialog.Builder alb=new AlertDialog.Builder(this);
+        alb.setMessage("Please Verify Documents");
+        alb.create().show();
     }
 
     private void showTextDialog(String status)

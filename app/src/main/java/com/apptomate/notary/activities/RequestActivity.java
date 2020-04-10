@@ -1,13 +1,14 @@
 package com.apptomate.notary.activities;
-
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatTextView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -19,7 +20,6 @@ import android.widget.RadioButton;
 import android.widget.RelativeLayout;
 import android.widget.SearchView;
 import android.widget.Toast;
-
 import com.apptomate.notary.R;
 import com.apptomate.notary.adapters.NotifictionAdapter;
 import com.apptomate.notary.adapters.RequestAdapter;
@@ -36,10 +36,12 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.stream.Collectors;
 
 public class RequestActivity extends AppCompatActivity implements SaveView
 {
 
+    private static final int LAUNCH_FILTER_ACTIVITY = 12;
     RecyclerView rv_notification;
     ProgressDialog progressDialog;
     SharedPrefs sharedPrefs;
@@ -48,6 +50,7 @@ public class RequestActivity extends AppCompatActivity implements SaveView
     private SearchView searchView;
     AppCompatTextView tv_notFound,tv_req_notfound;
     private RequestAdapter requestAdapter;
+    private String result;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,7 +89,16 @@ public class RequestActivity extends AppCompatActivity implements SaveView
     private void getRequestData(String type)
     {
        progressDialog.show();
-       new SaveImpl(this).handleSave(new JSONObject(),"requests?saasUserId="+id,"GET",type,token);
+       JSONObject js=new JSONObject();
+        try {
+            js.put("status","");
+            js.put("startDate","");
+            js.put("endDate","");
+            js.put("state","");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        new SaveImpl(this).handleSave(js,"requests?saasUserId="+id,"GET",type,token);
     }
 
 
@@ -99,7 +111,14 @@ public class RequestActivity extends AppCompatActivity implements SaveView
         }
         else if (item.getItemId()==R.id.notification_filter)
         {
-            showBottomSheetDialog();
+           // showBottomSheetDialog();
+            Intent i=new Intent(RequestActivity.this,FilterActivity.class);
+            if (result!=null)
+            {
+                i.putExtra("result",result);
+            }
+            startActivityForResult(i, LAUNCH_FILTER_ACTIVITY);
+            overridePendingTransition(R.anim.right_in, R.anim.left_out);
         }
         return true;
     }
@@ -133,65 +152,80 @@ public class RequestActivity extends AppCompatActivity implements SaveView
         if (code.equalsIgnoreCase("200"))
         {
             assignData(response,type);
+        }else if (code.equalsIgnoreCase("401"))
+        {
+            ApiConstants.logOut(this);
         }
     }
+
 
     private void assignData(String response,String type)
     {
         al.clear();
         try {
-           // JSONObject js=new JSONObject(response);
-           JSONArray ja= new JSONArray(response);
-           if (ja.length()==0)
-           {
-               tv_req_notfound.setVisibility(View.VISIBLE);
-           }
-           else {
-               tv_req_notfound.setVisibility(View.GONE);
-           }
-           for (int i=0;i<ja.length();i++)
-           {
-              JSONObject json= ja.getJSONObject(i);
-               String userRequestDetailsId= json.optString("userRequestDetailsId");
-               String requestedDate= json.optString("requestedDate");
-               String customerId= json.optString("customerId");
-               String status= json.optString("status");
-               String assignedTo= json.optString("assignedTo");
-               String documentsCount= json.optString("documentsCount");
-               String name= json.optString("name");
-               String fullAddress= json.optString("fullAddress");
-               String assignedToName= json.optString("assignedToName");
-               RequestModel requestModel=new RequestModel();
-               requestModel.setName(name);
-               requestModel.setAssignedTo(assignedTo);
-               requestModel.setUserRequestDetailsId(userRequestDetailsId);
-               requestModel.setAssignedToName(assignedToName);
-               requestModel.setCustomerId(customerId);
-               requestModel.setRequestedDate(requestedDate);
-               requestModel.setStatus(status);
-               requestModel.setFullAddress(fullAddress);
-               requestModel.setDocumentsCount(documentsCount);
-               al.add(requestModel);
+            // JSONObject js=new JSONObject(response);
+            JSONArray ja= new JSONArray(response);
+            if (ja.length()==0)
+            {
+                tv_req_notfound.setVisibility(View.VISIBLE);
+            }
+            else {
+                tv_req_notfound.setVisibility(View.GONE);
+            }
 
-           }
-           if (type.equalsIgnoreCase(""))
-           {
-               requestAdapter=  new RequestAdapter(this,al,tv_notFound);
-               rv_notification.setAdapter(requestAdapter);
-           }
-           else if (type.equalsIgnoreCase("name"))
-           {
-               ArrayList<RequestModel> sortedByName = new SortbyStatus(al).getSortedByName();
-               requestAdapter=  new RequestAdapter(this,sortedByName,tv_notFound);
-               rv_notification.setAdapter(requestAdapter);
-           }
-           else
-           {
-               ArrayList<RequestModel> sortedByName = new SortbyStatus(al).getSortedByStatus();
-               requestAdapter=  new RequestAdapter(this,sortedByName,tv_notFound);
-               rv_notification.setAdapter(requestAdapter);
-           }
+            for (int i=0;i<ja.length();i++)
+            {
+                JSONObject json= ja.getJSONObject(i);
+                String userRequestDetailsId= json.optString("userRequestDetailsId");
+                String requestedDate= json.optString("requestedDate");
+                String customerId= json.optString("customerId");
+                String status= json.optString("status");
+                String assignedTo= json.optString("assignedTo");
+                String documentsCount= json.optString("documentsCount");
+                String name= json.optString("name");
+                String fullAddress= json.optString("fullAddress");
+                String assignedToName= json.optString("assignedToName");
+                if (!type.equalsIgnoreCase(""))
+                {
+                    JSONArray jaa=new JSONArray(type);
+                    for (int j=0;j<jaa.length();j++)
+                    {
+                       String namee= jaa.getJSONObject(j).optString("name");
+                       if (status.equalsIgnoreCase(namee))
+                       {
+                           RequestModel requestModel=new RequestModel();
+                           requestModel.setName(name);
+                           requestModel.setAssignedTo(assignedTo);
+                           requestModel.setUserRequestDetailsId(userRequestDetailsId);
+                           requestModel.setAssignedToName(assignedToName);
+                           requestModel.setCustomerId(customerId);
+                           requestModel.setRequestedDate(requestedDate);
+                           requestModel.setStatus(status);
+                           requestModel.setFullAddress(fullAddress);
+                           requestModel.setDocumentsCount(documentsCount);
+                           al.add(requestModel);
+                       }
+                    }
 
+                }else {
+                    RequestModel requestModel=new RequestModel();
+                    requestModel.setName(name);
+                    requestModel.setAssignedTo(assignedTo);
+                    requestModel.setUserRequestDetailsId(userRequestDetailsId);
+                    requestModel.setAssignedToName(assignedToName);
+                    requestModel.setCustomerId(customerId);
+                    requestModel.setRequestedDate(requestedDate);
+                    requestModel.setStatus(status);
+                    requestModel.setFullAddress(fullAddress);
+                    requestModel.setDocumentsCount(documentsCount);
+                    al.add(requestModel);
+                }
+
+
+            }
+           // ArrayList<RequestModel> sortedByName = new SortbyStatus(al).getSortedByStatus();
+            requestAdapter=  new RequestAdapter(this,al,tv_notFound);
+            rv_notification.setAdapter(requestAdapter);
 
             searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener()
             {
@@ -213,6 +247,84 @@ public class RequestActivity extends AppCompatActivity implements SaveView
             e.printStackTrace();
         }
     }
+
+//    private void assignData(String response,String type)
+//    {
+//        al.clear();
+//        try {
+//           // JSONObject js=new JSONObject(response);
+//           JSONArray ja= new JSONArray(response);
+//           if (ja.length()==0)
+//           {
+//               tv_req_notfound.setVisibility(View.VISIBLE);
+//           }
+//           else {
+//               tv_req_notfound.setVisibility(View.GONE);
+//           }
+//           for (int i=0;i<ja.length();i++)
+//           {
+//              JSONObject json= ja.getJSONObject(i);
+//               String userRequestDetailsId= json.optString("userRequestDetailsId");
+//               String requestedDate= json.optString("requestedDate");
+//               String customerId= json.optString("customerId");
+//               String status= json.optString("status");
+//               String assignedTo= json.optString("assignedTo");
+//               String documentsCount= json.optString("documentsCount");
+//               String name= json.optString("name");
+//               String fullAddress= json.optString("fullAddress");
+//               String assignedToName= json.optString("assignedToName");
+//               RequestModel requestModel=new RequestModel();
+//               requestModel.setName(name);
+//               requestModel.setAssignedTo(assignedTo);
+//               requestModel.setUserRequestDetailsId(userRequestDetailsId);
+//               requestModel.setAssignedToName(assignedToName);
+//               requestModel.setCustomerId(customerId);
+//               requestModel.setRequestedDate(requestedDate);
+//               requestModel.setStatus(status);
+//               requestModel.setFullAddress(fullAddress);
+//               requestModel.setDocumentsCount(documentsCount);
+//               al.add(requestModel);
+//
+//           }
+//           if (type.equalsIgnoreCase(""))
+//           {
+//               requestAdapter=  new RequestAdapter(this,al,tv_notFound);
+//               rv_notification.setAdapter(requestAdapter);
+//           }
+//           else if (type.equalsIgnoreCase("name"))
+//           {
+//               ArrayList<RequestModel> sortedByName = new SortbyStatus(al).getSortedByName();
+//               requestAdapter=  new RequestAdapter(this,sortedByName,tv_notFound);
+//               rv_notification.setAdapter(requestAdapter);
+//           }
+//           else
+//           {
+//               ArrayList<RequestModel> sortedByName = new SortbyStatus(al).getSortedByStatus();
+//               requestAdapter=  new RequestAdapter(this,sortedByName,tv_notFound);
+//               rv_notification.setAdapter(requestAdapter);
+//           }
+//
+//
+//            searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener()
+//            {
+//                @Override
+//                public boolean onQueryTextSubmit(String s)
+//                {
+//                    return false;
+//                }
+//
+//                @Override
+//                public boolean onQueryTextChange(String s)
+//                {
+//                    String text = s;
+//                    requestAdapter.filter(text);
+//                    return false;
+//                }
+//            });
+//        } catch (JSONException e) {
+//            e.printStackTrace();
+//        }
+//    }
 
     @Override
     public void onSaveFailure(String error) {
@@ -276,5 +388,52 @@ public class RequestActivity extends AppCompatActivity implements SaveView
     {
         super.onRestart();
         getRequestData(sharedPrefs.getStatus().get(SharedPrefs.STATUS_DATA));
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == LAUNCH_FILTER_ACTIVITY)
+        {
+            if(resultCode == Activity.RESULT_OK){
+                 result=data.getStringExtra("result");
+                if (result != null && !result.equalsIgnoreCase("[]"))
+                {
+                    getRequestData(result);
+                }
+                else {
+                    getRequestData("");
+                }
+                Log.e("Result",result);
+
+                try {
+                    JSONArray ja=new JSONArray(result);
+                    ArrayList<String> arrayList=new ArrayList<>();
+                    for (int i=0;i<ja.length();i++)
+                    {
+                        arrayList.add(ja.getJSONObject(i).optString("name"));
+                    }
+                    String s  ="'"+arrayList.toString().replace("[","").replace("]", "").replace(" ","").replace(",","','")+"'";
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
+                    {
+                        Log.e("Result",arrayList.stream().collect(Collectors.joining("','", "'", "'")));
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+
+
+//                if (result != null && result.equalsIgnoreCase("notificationResult")) {
+//                    getNotificationCount();
+//                }
+            }
+            if (resultCode == Activity.RESULT_CANCELED) {
+                //Write your code if there's no result
+            }
+        }
+
+
     }
 }

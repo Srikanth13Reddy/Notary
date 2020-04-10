@@ -9,7 +9,9 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -78,6 +80,12 @@ public class NotificationActivity extends AppCompatActivity implements SaveView
 
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.notification,menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
     private void getLoginData()
     {
         sharedPrefs=new SharedPrefs(this);
@@ -101,6 +109,25 @@ public class NotificationActivity extends AppCompatActivity implements SaveView
         if (item.getItemId()==android.R.id.home)
         {
             onBackPressed();
+        }else if (item.getItemId()==R.id.readAll)
+        {
+            AlertDialog.Builder alb=new AlertDialog.Builder(this);
+            alb.setTitle("Confirmation");
+            alb.setMessage("Do You Want Update to Read All ");
+            alb.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    readAll();
+                }
+            });
+           alb.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+               @Override
+               public void onClick(DialogInterface dialog, int which) {
+                   dialog.dismiss();
+               }
+           });
+           alb.create().show();
+
         }
         return true;
     }
@@ -131,6 +158,9 @@ public class NotificationActivity extends AppCompatActivity implements SaveView
            if (code.equalsIgnoreCase("200"))
            {
                assignData(response);
+           }else if (code.equalsIgnoreCase("401"))
+           {
+               ApiConstants.logOut(this);
            }
            else {
                Toast.makeText(this, ""+response, Toast.LENGTH_SHORT).show();
@@ -190,13 +220,26 @@ public class NotificationActivity extends AppCompatActivity implements SaveView
         getData();
     }
 
-    void saveNotificationCount()
+    void readAll()
     {
         progressDialog.show();
-        @SuppressLint("SetTextI18n") StringRequest stringRequest=new StringRequest(Request.Method.GET, ApiConstants.BaseUrl +"notificationview?saasUserId=" + id, response -> {
+        @SuppressLint("SetTextI18n") StringRequest stringRequest=new StringRequest(Request.Method.PUT, ApiConstants.BaseUrl +"usernotificationreadall?saasUserId=" + id, response -> {
             progressDialog.dismiss();
-            ArrayList<Integer> arrayList=new ArrayList<>();
-
+            Log.e("RES",response);
+            try {
+                JSONObject js=new JSONObject(response);
+                String status= js.optString("status");
+                String message= js.optString("message");
+                if (status.equalsIgnoreCase("Success"))
+                {
+                    getData();
+                    Toast.makeText(this, ""+message, Toast.LENGTH_SHORT).show();
+                }else {
+                    Toast.makeText(this, ""+message, Toast.LENGTH_SHORT).show();
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
 
         }, error -> {
             progressDialog.dismiss();

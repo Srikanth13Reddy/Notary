@@ -139,6 +139,9 @@ public class InprogressActivity extends AppCompatActivity implements SaveView
         if (code.equalsIgnoreCase("200"))
         {
             assignData(response,type);
+        }else if (code.equalsIgnoreCase("401"))
+        {
+            ApiConstants.logOut(this);
         }
     }
 

@@ -163,6 +163,9 @@ public class ProfileActivity extends AppCompatActivity implements SaveView
             } catch (JSONException e) {
                 e.printStackTrace();
             }
+        }else if (code.equalsIgnoreCase("401"))
+        {
+            ApiConstants.logOut(this);
         }
 
     }
@@ -414,12 +417,18 @@ public class ProfileActivity extends AppCompatActivity implements SaveView
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
             Bundle extras = data.getExtras();
-            Bitmap imageBitmap = (Bitmap) extras.get("data");
+            Bitmap imageBitmap = null;
+            if (extras != null) {
+                imageBitmap = (Bitmap) extras.get("data");
+            }
             // tv_path.setVisibility(View.VISIBLE);
             iv.setImageBitmap(imageBitmap);
-            Uri uri = getImageUri(imageBitmap, Bitmap.CompressFormat.PNG, 100);
+            Uri uri = null;
+            if (imageBitmap != null) {
+                uri = getImageUri(imageBitmap, Bitmap.CompressFormat.PNG, 100);
+            }
             String path = getRealPathFromURI(ProfileActivity.this, uri);
-            uploadImage(path, "1");
+            uploadImage(path, id);
 
 
             // tv_path.setText(encoded);

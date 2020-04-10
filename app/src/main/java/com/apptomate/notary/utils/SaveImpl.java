@@ -78,13 +78,13 @@ public class SaveImpl implements SavePresenter {
                 res = Objects.requireNonNull(response.body()).string();
                 if (response.isSuccessful() && response.code() == 200) {
 
-                    Log.d("Tag", "Successfully authenticated");
+                    Log.e("Tag", "Successfully authenticated");
                     // Toast.makeText(LoginActivity.this, ""+res, Toast.LENGTH_SHORT).show();
                     looper("Success",token);
 
                 } else { //called if the credentials are incorrect
                     Log.d("Tag", "Registration failed " + response.networkResponse());
-                    looper("500Error",token);
+                    looper(""+response.code(),token);
 
                 }
             }
@@ -108,8 +108,22 @@ public class SaveImpl implements SavePresenter {
                 loginView.onSaveSucess("200", res,type);
             } else if (message.equalsIgnoreCase("Fail")) {
                 loginView.onSaveFailure("Something Went Wrong");
-            } else if (message.equalsIgnoreCase("500Error")) {
-                loginView.onSaveSucess("500", res,type);
+            } else  {
+                loginView.onSaveSucess(message, res,type);
+            }
+        });
+    }
+
+    private void logOut(final String message,String type) {
+        Handler handler = new Handler(getMainLooper());
+        handler.post(() -> {
+            //progressDialog.dismiss();
+            if (message.equalsIgnoreCase("Success")) {
+                loginView.onSaveSucess("200", res,type);
+            } else if (message.equalsIgnoreCase("Fail")) {
+                loginView.onSaveFailure("Something Went Wrong");
+            } else  {
+                loginView.onSaveSucess(message, res,type);
             }
         });
     }
