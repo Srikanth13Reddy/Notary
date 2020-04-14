@@ -113,7 +113,7 @@ public class NotificationActivity extends AppCompatActivity implements SaveView
         {
             AlertDialog.Builder alb=new AlertDialog.Builder(this);
             alb.setTitle("Confirmation");
-            alb.setMessage("Do You Want Update to Read All ");
+            alb.setMessage("Do You Want to Read All ");
             alb.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {

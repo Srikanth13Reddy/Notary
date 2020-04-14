@@ -82,7 +82,7 @@
                 <androidx.appcompat.widget.AppCompatTextView
                     android:layout_width="wrap_content"
                     android:layout_centerVertical="true"
-                    android:text="Your Notary Team Members"
+                    android:text="Your Notary Members"
                     android:layout_marginStart="12dp"
                     android:textSize="18dp"
                     android:fontFamily="@font/sspbold"

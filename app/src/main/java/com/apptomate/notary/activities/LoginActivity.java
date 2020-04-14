@@ -3,7 +3,11 @@ package com.apptomate.notary.activities;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatEditText;
 
+import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -14,6 +18,7 @@ import android.text.method.HideReturnsTransformationMethod;
 import android.text.method.PasswordTransformationMethod;
 import android.util.Log;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.Toast;
@@ -121,6 +126,7 @@ public class LoginActivity extends AppCompatActivity implements SaveView
                 et_pass.requestFocus();
             }
             else {
+                hideKeyboard();
                 //log_checkBox.setVisibility(View.VISIBLE);
                 loginToNotary(et_mail.getText().toString().trim(),et_pass.getText().toString().trim());
 
@@ -167,23 +173,40 @@ public class LoginActivity extends AppCompatActivity implements SaveView
 //        }
 
 
-        if (code.equalsIgnoreCase("200"))
-        {
-           sharedPrefs.saveLoginData(response);
-           sharedPrefs.LoginSuccess();
-           finish();
-           Intent i=new Intent(LoginActivity.this,HomeActivity.class);
-           startActivity(i);
-           overridePendingTransition(R.anim.right_in, R.anim.left_out);
-        }
-        else if (code.equalsIgnoreCase("500"))
-        {
+
+
             try {
-                Toast.makeText(this, ""+new JSONObject(response).optString("error"), Toast.LENGTH_SHORT).show();
+                JSONObject js1=new JSONObject(response);
+                String status= js1.optString("status");
+                String message= js1.optString("message");
+                if (status.equalsIgnoreCase("Success"))
+                {
+                    JSONObject js= js1.getJSONObject("data");
+                    sharedPrefs.saveLoginData(js.toString());
+                    String isActive= js.optString("status");
+                    if (isActive.equalsIgnoreCase("inactive"))
+                    {
+                        ApiConstants.showSubscriptionDialog(this);
+
+                    }else if (isActive.equalsIgnoreCase("trial"))
+                    {
+                       showtrailDialog();
+                    }else {
+                        sharedPrefs.LoginSuccess();
+                        finish();
+                        Intent i=new Intent(LoginActivity.this,HomeActivity.class);
+                        startActivity(i);
+                        overridePendingTransition(R.anim.right_in, R.anim.left_out);
+                    }
+                }else {
+                    Toast.makeText(this, ""+message, Toast.LENGTH_SHORT).show();
+                }
+
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-        }
+
+
 
     }
 
@@ -223,6 +246,24 @@ public class LoginActivity extends AppCompatActivity implements SaveView
 
     }
 
+    void showtrailDialog()
+    {
+        AlertDialog.Builder alb=new AlertDialog.Builder(this).setTitle("Alert").setMessage("You are in 30 days trial period")
+                .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                        sharedPrefs.LoginSuccess();
+                        finish();
+                        Intent i=new Intent(LoginActivity.this,HomeActivity.class);
+                        startActivity(i);
+                        overridePendingTransition(R.anim.right_in, R.anim.left_out);
+                    }
+                });
+        alb.setCancelable(false);
+        alb.create().show();
+    }
+
     @Override
     public void onBackPressed()
     {
@@ -243,5 +284,17 @@ public class LoginActivity extends AppCompatActivity implements SaveView
 //                doubleBackToExitPressedOnce=false;
 //            }
 //        },2000);
+    }
+
+    public void hideKeyboard() {
+        InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+        //Find the currently focused view, so we can grab the correct window token from it.
+        View view = getCurrentFocus();
+        //If no view currently has focus, create a new one, just so we can grab a window token from it
+        if (imm != null) {
+            if (view != null) {
+                imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+            }
+        }
     }
 }

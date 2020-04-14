@@ -15,7 +15,7 @@
         android:layout_height="match_parent">
         <RelativeLayout
             android:layout_width="120dp"
-            android:layout_marginTop="50sp"
+            android:layout_marginTop="24sp"
             android:layout_height="120dp">
             <de.hdodenhof.circleimageview.CircleImageView
                 android:id="@+id/profile_image_notary"

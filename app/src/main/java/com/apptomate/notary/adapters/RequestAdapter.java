@@ -16,7 +16,10 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.apptomate.notary.R;
 import com.apptomate.notary.activities.ClientInfo;
+import com.apptomate.notary.activities.RequestActivity;
 import com.apptomate.notary.models.RequestModel;
+import com.apptomate.notary.utils.ApiConstants;
+import com.apptomate.notary.utils.SharedPrefs;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -35,14 +38,14 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.MyHolder
 {
     Context context;
     ArrayList<RequestModel> arraylist;
-    private ArrayList<RequestModel> imageModelArrayList;
+    private ArrayList<RequestModel> requestlist;
     AppCompatTextView tv_notFound;
 
-    public RequestAdapter(Context context, ArrayList<RequestModel> imageModelArrayList, AppCompatTextView tv_notFound) {
+    public RequestAdapter(Context context, ArrayList<RequestModel> requestlist, AppCompatTextView tv_notFound) {
         this.context = context;
-        this.imageModelArrayList = imageModelArrayList;
+        this.requestlist = requestlist;
         this.arraylist = new ArrayList<RequestModel>();
-        this.arraylist.addAll(imageModelArrayList);
+        this.arraylist.addAll(requestlist);
         this.tv_notFound=tv_notFound;
     }
 
@@ -61,7 +64,7 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.MyHolder
 
 
 
-         RequestModel obj= imageModelArrayList.get(position);
+         RequestModel obj= requestlist.get(position);
          if (obj!=null)
          {
              holder.tv_time_rqst.setText(time(obj.getRequestedDate()));
@@ -99,13 +102,18 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.MyHolder
                  @Override
                  public void onClick(View v)
                  {
-                     Intent i=new Intent(context, ClientInfo.class);
-                     i.putExtra("rId",obj.getUserRequestDetailsId());
-                     i.putExtra("status",obj.getStatus());
-                     i.putExtra("notary",obj.getAssignedToName());
-                     context.startActivity(i);
-                     Activity mContext = (Activity) context;
-                     mContext.overridePendingTransition(R.anim.right_in, R.anim.left_out);
+                     if (ApiConstants.isNetworkConnected(context))
+                     {
+                         Intent i=new Intent(context, ClientInfo.class);
+                         i.putExtra("rId",obj.getUserRequestDetailsId());
+                         i.putExtra("status",obj.getStatus());
+                         i.putExtra("notary",obj.getAssignedToName());
+                         context.startActivity(i);
+                         Activity mContext = (Activity) context;
+                         mContext.overridePendingTransition(R.anim.right_in, R.anim.left_out);
+                     }else {
+                         ApiConstants.showNetworkMessage(context);
+                     }
                  }
              });
          }
@@ -115,17 +123,17 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.MyHolder
     public void filter(String charText)
     {
         charText = charText.toLowerCase(Locale.getDefault());
-        imageModelArrayList.clear();
+        requestlist.clear();
         if (charText.length() == 0) {
-            imageModelArrayList.addAll(arraylist);
+            requestlist.addAll(arraylist);
         } else {
             for (RequestModel wp : arraylist) {
                 if (wp.getName().toLowerCase(Locale.getDefault()).contains(charText)) {
-                    imageModelArrayList.add(wp);
+                    requestlist.add(wp);
                 }
             }
         }
-        if (imageModelArrayList.size()==0)
+        if (requestlist.size()==0)
         {
             tv_notFound.setVisibility(View.VISIBLE);
         }
@@ -139,7 +147,7 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.MyHolder
     @Override
     public int getItemCount()
     {
-        return imageModelArrayList.size();
+        return requestlist.size();
     }
 
     class MyHolder extends RecyclerView.ViewHolder

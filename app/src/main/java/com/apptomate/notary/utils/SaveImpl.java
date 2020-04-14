@@ -31,10 +31,10 @@ public class SaveImpl implements SavePresenter {
     }
 
     @Override
-    public void handleSave(JSONObject jsonObject, String connectionId, String type,String token,String auth)
+    public void handleSave(JSONObject jsonObject, String connectionId, String type,String typee,String auth)
     {
 
-        onRegister(jsonObject, connectionId, type, token,auth);
+        onRegister(jsonObject, connectionId, type, typee,auth);
     }
 
     private void onRegister(JSONObject jsonObject, String connectionId, String type,String token,String auth) {

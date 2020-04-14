@@ -10,12 +10,19 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.LinearLayout;
+import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
@@ -123,6 +130,7 @@ public class HomeActivity extends AppCompatActivity implements SaveView
     private void getLoginData()
     {
         sharedPrefs=new SharedPrefs(this);
+        Log.e("LoginResponse",sharedPrefs.getLoginData().get(SharedPrefs.LOGIN_DATA));
         try {
             if (sharedPrefs.getLoginData().get(SharedPrefs.LOGIN_DATA)!=null)
             {
@@ -131,11 +139,13 @@ public class HomeActivity extends AppCompatActivity implements SaveView
                 token= js.optString("token");
                 roleId= js.optString("roleId");
                 agencyId= js.optString("agencyId");
+               boolean isActive= js.optBoolean("isActive");
+//
                 if (roleId.equalsIgnoreCase("1"))
                 {
                     notaryListCount();
                 }
-                Log.e("LoginResponse",sharedPrefs.getLoginData().get(SharedPrefs.LOGIN_DATA));
+
                 if (roleId!=null&&roleId.equalsIgnoreCase("1"))
                 {
                     rl_notary.setVisibility(View.VISIBLE);
@@ -197,29 +207,50 @@ public class HomeActivity extends AppCompatActivity implements SaveView
 
     public void request(View view)
     {
-        Intent i=new Intent(HomeActivity.this,RequestActivity.class);
-        startActivity(i);
-        overridePendingTransition(R.anim.right_in, R.anim.left_out);
+        if (ApiConstants.isNetworkConnected(this))
+        {
+            Intent i=new Intent(HomeActivity.this,RequestActivity.class);
+            startActivity(i);
+            overridePendingTransition(R.anim.right_in, R.anim.left_out);
+        }else {
+            ApiConstants.showNetworkMessage(this);
+        }
+
     }
 
     public void process(View view) {
-        Intent i=new Intent(HomeActivity.this,InprogressActivity.class);
-        startActivity(i);
-        overridePendingTransition(R.anim.right_in, R.anim.left_out);
+        if (ApiConstants.isNetworkConnected(this))
+        {
+            Intent i=new Intent(HomeActivity.this,InprogressActivity.class);
+            startActivity(i);
+            overridePendingTransition(R.anim.right_in, R.anim.left_out);
+        }else {
+            ApiConstants.showNetworkMessage(this);
+        }
     }
 
     public void pending(View view) {
 
-        Intent i=new Intent(HomeActivity.this,PendingActivity.class);
-        startActivity(i);
-        overridePendingTransition(R.anim.right_in, R.anim.left_out);
+        if (ApiConstants.isNetworkConnected(this))
+        {
+            Intent i=new Intent(HomeActivity.this,PendingActivity.class);
+            startActivity(i);
+            overridePendingTransition(R.anim.right_in, R.anim.left_out);
+        }else {
+            ApiConstants.showNetworkMessage(this);
+        }
     }
 
     public void complete(View view) {
 
-        Intent i=new Intent(HomeActivity.this,CompleteActivity.class);
-        startActivity(i);
-        overridePendingTransition(R.anim.right_in, R.anim.left_out);
+        if (ApiConstants.isNetworkConnected(this))
+        {
+            Intent i=new Intent(HomeActivity.this,CompleteActivity.class);
+            startActivity(i);
+            overridePendingTransition(R.anim.right_in, R.anim.left_out);
+        }else {
+            ApiConstants.showNetworkMessage(this);
+        }
     }
 
 
@@ -339,29 +370,35 @@ public class HomeActivity extends AppCompatActivity implements SaveView
         progressDialog.show();
         @SuppressLint("SetTextI18n") StringRequest stringRequest=new StringRequest(Request.Method.GET, ApiConstants.BaseUrl +"saasusernotification?saasUserId=" + id, response -> {
             progressDialog.dismiss();
-            ArrayList<Integer> arrayList=new ArrayList<>();
-            try {
-                JSONArray ja=new JSONArray(response);
-                for (int i=0;i<ja.length();i++)
-                {
-                   JSONObject json= ja.getJSONObject(i);
-                   if (json.optString("status").equalsIgnoreCase("send"))
-                   {
-                       arrayList.add(i);
-                   }
-                }
-                if (arrayList.size()>0)
-                {
-                    tv_not_count.setVisibility(View.VISIBLE);
-                    tv_not_count.setText(""+arrayList.size());
-                }
-                else {
-                    tv_not_count.setVisibility(View.GONE);
-                }
+            if (response.equalsIgnoreCase("{\"status\":\"Error\",\"message\":\"User is in Inactive\"}"))
+            {
+                ApiConstants.showSubscriptionDialog(this);
+            }else {
+                ArrayList<Integer> arrayList=new ArrayList<>();
+                try {
+                    JSONArray ja=new JSONArray(response);
+                    for (int i=0;i<ja.length();i++)
+                    {
+                        JSONObject json= ja.getJSONObject(i);
+                        if (json.optString("status").equalsIgnoreCase("send"))
+                        {
+                            arrayList.add(i);
+                        }
+                    }
+                    if (arrayList.size()>0)
+                    {
+                        tv_not_count.setVisibility(View.VISIBLE);
+                        tv_not_count.setText(""+arrayList.size());
+                    }
+                    else {
+                        tv_not_count.setVisibility(View.GONE);
+                    }
 
-            } catch (JSONException e) {
-                e.printStackTrace();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
             }
+
 
         }, error -> {
             progressDialog.dismiss();
@@ -412,13 +449,22 @@ public class HomeActivity extends AppCompatActivity implements SaveView
         progressDialog.show();
         @SuppressLint("SetTextI18n") StringRequest stringRequest=new StringRequest(Request.Method.GET, ApiConstants.BaseUrl +"agencynotaries?agencyId="+agencyId, response -> {
             progressDialog.dismiss();
-            try {
-                JSONArray ja=new JSONArray(response);
-                tv_notary_count.setText(""+ja.length());
+            Log.e("Res",response);
+            if (response.equalsIgnoreCase("{\"status\":\"Error\",\"message\":\"User is in Inactive\"}"))
+            {
+                ApiConstants.showSubscriptionDialog(this);
+            }else
+            {
 
-            } catch (JSONException e) {
-                e.printStackTrace();
+                try {
+                    JSONArray ja=new JSONArray(response);
+                    tv_notary_count.setText(""+ja.length());
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
             }
+
 
         }, error -> {
             progressDialog.dismiss();
@@ -442,4 +488,8 @@ public class HomeActivity extends AppCompatActivity implements SaveView
         getNotificationCount();
     }
     //onActivityResult
+
+
+
+
 }

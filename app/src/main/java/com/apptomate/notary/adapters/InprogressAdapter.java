@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.apptomate.notary.R;
 import com.apptomate.notary.activities.ClientInfo;
 import com.apptomate.notary.models.RequestModel;
+import com.apptomate.notary.utils.ApiConstants;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -30,14 +31,14 @@ public class InprogressAdapter extends RecyclerView.Adapter<InprogressAdapter.My
 {
     Context context;
     ArrayList<RequestModel> arraylist;
-    private ArrayList<RequestModel> imageModelArrayList;
+    private ArrayList<RequestModel> requestlist;
     AppCompatTextView tv_notFound;
 
-    public InprogressAdapter(Context context, ArrayList<RequestModel> imageModelArrayList, AppCompatTextView tv_notFound) {
+    public InprogressAdapter(Context context, ArrayList<RequestModel> requestlist, AppCompatTextView tv_notFound) {
         this.context = context;
-        this.imageModelArrayList = imageModelArrayList;
+        this.requestlist = requestlist;
         this.arraylist = new ArrayList<RequestModel>();
-        this.arraylist.addAll(imageModelArrayList);
+        this.arraylist.addAll(requestlist);
         this.tv_notFound=tv_notFound;
     }
 
@@ -53,40 +54,46 @@ public class InprogressAdapter extends RecyclerView.Adapter<InprogressAdapter.My
     @SuppressLint("SetTextI18n")
     @Override
     public void onBindViewHolder(@NonNull MyHolder holder, int position) {
-        if (imageModelArrayList.get(position)!=null)
+        if (requestlist.get(position)!=null)
         {
-            RequestModel obj=imageModelArrayList.get(position);
+            RequestModel obj=requestlist.get(position);
             holder.tv_time_process.setText(time(obj.getRequestedDate()));
             holder.tv_documents_process.setText("Documents - "+obj.getDocumentsCount());
             holder.tv_address_process.setText(obj.getFullAddress());
             holder.name_tv_process.setText(toTitleCase(obj.getName()));
            // holder.tv_notary_name.setText(obj.getAssignedToName());
             holder.tv_notary_name.setText(toTitleCase(obj.getAssignedToName()));
-            holder.itemView.setOnClickListener(v -> {
-                Intent i=new Intent(context, ClientInfo.class);
-                i.putExtra("rId",obj.getUserRequestDetailsId());
-                i.putExtra("status",obj.getStatus());
-                i.putExtra("notary",obj.getAssignedToName());
-                context.startActivity(i);
-                Activity mContext = (Activity) context;
-                mContext.overridePendingTransition(R.anim.right_in, R.anim.left_out);
+            holder.itemView.setOnClickListener(v ->
+            {
+                if (ApiConstants.isNetworkConnected(context))
+                {
+                    Intent i=new Intent(context, ClientInfo.class);
+                    i.putExtra("rId",obj.getUserRequestDetailsId());
+                    i.putExtra("status",obj.getStatus());
+                    i.putExtra("notary",obj.getAssignedToName());
+                    context.startActivity(i);
+                    Activity mContext = (Activity) context;
+                    mContext.overridePendingTransition(R.anim.right_in, R.anim.left_out);
+                }else {
+                    ApiConstants.showNetworkMessage(context);
+                }
             });
         }
     }
 
     public void filter(String charText) {
         charText = charText.toLowerCase(Locale.getDefault());
-        imageModelArrayList.clear();
+        requestlist.clear();
         if (charText.length() == 0) {
-            imageModelArrayList.addAll(arraylist);
+            requestlist.addAll(arraylist);
         } else {
             for (RequestModel wp : arraylist) {
                 if (wp.getName().toLowerCase(Locale.getDefault()).contains(charText)) {
-                    imageModelArrayList.add(wp);
+                    requestlist.add(wp);
                 }
             }
         }
-        if (imageModelArrayList.size()==0)
+        if (requestlist.size()==0)
         {
             tv_notFound.setVisibility(View.VISIBLE);
         }
@@ -98,7 +105,7 @@ public class InprogressAdapter extends RecyclerView.Adapter<InprogressAdapter.My
 
     @Override
     public int getItemCount() {
-        return imageModelArrayList.size();
+        return requestlist.size();
     }
 
     class MyHolder extends RecyclerView.ViewHolder

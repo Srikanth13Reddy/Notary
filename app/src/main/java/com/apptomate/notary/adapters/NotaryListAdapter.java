@@ -127,7 +127,7 @@ public class NotaryListAdapter extends RecyclerView.Adapter<NotaryListAdapter.My
         JSONObject js=new JSONObject();
         try {
             js.put("assignedTo",id);
-            js.put("assignedFrom",this.id);
+            js.put("saasUserId",this.id);
         } catch (JSONException e)
         {
             e.printStackTrace();

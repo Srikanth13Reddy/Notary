@@ -4,6 +4,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatTextView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -19,7 +21,12 @@ import android.view.View;
 import android.widget.RadioButton;
 import android.widget.RelativeLayout;
 import android.widget.SearchView;
+import android.widget.TextView;
 import android.widget.Toast;
+
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
+import com.android.volley.toolbox.StringRequest;
 import com.apptomate.notary.R;
 import com.apptomate.notary.adapters.NotifictionAdapter;
 import com.apptomate.notary.adapters.RequestAdapter;
@@ -27,6 +34,7 @@ import com.apptomate.notary.interfaces.SaveView;
 import com.apptomate.notary.models.RequestModel;
 import com.apptomate.notary.models.SortbyStatus;
 import com.apptomate.notary.utils.ApiConstants;
+import com.apptomate.notary.utils.MySingleton;
 import com.apptomate.notary.utils.SaveImpl;
 import com.apptomate.notary.utils.SharedPrefs;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
@@ -35,7 +43,10 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class RequestActivity extends AppCompatActivity implements SaveView
@@ -51,6 +62,8 @@ public class RequestActivity extends AppCompatActivity implements SaveView
     AppCompatTextView tv_notFound,tv_req_notfound;
     private RequestAdapter requestAdapter;
     private String result;
+    private ArrayList<String> filterarrayList;
+    private String dates;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,16 +102,16 @@ public class RequestActivity extends AppCompatActivity implements SaveView
     private void getRequestData(String type)
     {
        progressDialog.show();
-       JSONObject js=new JSONObject();
-        try {
-            js.put("status","");
-            js.put("startDate","");
-            js.put("endDate","");
-            js.put("state","");
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        new SaveImpl(this).handleSave(js,"requests?saasUserId="+id,"GET",type,token);
+//       JSONObject js=new JSONObject();
+//        try {
+//            js.put("status","");
+//            js.put("startDate","");
+//            js.put("endDate","");
+//            js.put("state","");
+//        } catch (JSONException e) {
+//            e.printStackTrace();
+//        }
+        new SaveImpl(this).handleSave(new JSONObject(),"requests?saasUserId="+id,"GET",type,token);
     }
 
 
@@ -116,6 +129,7 @@ public class RequestActivity extends AppCompatActivity implements SaveView
             if (result!=null)
             {
                 i.putExtra("result",result);
+                i.putExtra("date",dates);
             }
             startActivityForResult(i, LAUNCH_FILTER_ACTIVITY);
             overridePendingTransition(R.anim.right_in, R.anim.left_out);
@@ -149,13 +163,20 @@ public class RequestActivity extends AppCompatActivity implements SaveView
     public void onSaveSucess(String code, String response,String type) {
         progressDialog.dismiss();
         Log.e("RequestRes",response);
-        if (code.equalsIgnoreCase("200"))
+
+        if (response.equalsIgnoreCase("{\"status\":\"Error\",\"message\":\"User is in Inactive\"}"))
         {
-            assignData(response,type);
-        }else if (code.equalsIgnoreCase("401"))
-        {
-            ApiConstants.logOut(this);
+            ApiConstants.showSubscriptionDialog(this);
+        }else {
+            if (code.equalsIgnoreCase("200"))
+            {
+                assignData(response,type);
+            }else if (code.equalsIgnoreCase("401"))
+            {
+                ApiConstants.logOut(this);
+            }
         }
+
     }
 
 
@@ -163,70 +184,56 @@ public class RequestActivity extends AppCompatActivity implements SaveView
     {
         al.clear();
         try {
-            // JSONObject js=new JSONObject(response);
-            JSONArray ja= new JSONArray(response);
-            if (ja.length()==0)
-            {
-                tv_req_notfound.setVisibility(View.VISIBLE);
-            }
-            else {
-                tv_req_notfound.setVisibility(View.GONE);
-            }
+           // JSONObject js=new JSONObject(response);
+           JSONArray ja= new JSONArray(response);
+           if (ja.length()==0)
+           {
+               tv_req_notfound.setVisibility(View.VISIBLE);
+           }
+           else {
+               tv_req_notfound.setVisibility(View.GONE);
+           }
+           for (int i=0;i<ja.length();i++)
+           {
+              JSONObject json= ja.getJSONObject(i);
+               String userRequestDetailsId= json.optString("userRequestDetailsId");
+               String requestedDate= json.optString("requestedDate");
+               String customerId= json.optString("customerId");
+               String status= json.optString("status");
+               String assignedTo= json.optString("assignedTo");
+               String documentsCount= json.optString("documentsCount");
+               String name= json.optString("name");
+               String fullAddress= json.optString("fullAddress");
+               String assignedToName= json.optString("assignedToName");
+               RequestModel requestModel=new RequestModel();
+               requestModel.setName(name);
+               requestModel.setAssignedTo(assignedTo);
+               requestModel.setUserRequestDetailsId(userRequestDetailsId);
+               requestModel.setAssignedToName(assignedToName);
+               requestModel.setCustomerId(customerId);
+               requestModel.setRequestedDate(requestedDate);
+               requestModel.setStatus(status);
+               requestModel.setFullAddress(fullAddress);
+               requestModel.setDocumentsCount(documentsCount);
+               al.add(requestModel);
 
-            for (int i=0;i<ja.length();i++)
-            {
-                JSONObject json= ja.getJSONObject(i);
-                String userRequestDetailsId= json.optString("userRequestDetailsId");
-                String requestedDate= json.optString("requestedDate");
-                String customerId= json.optString("customerId");
-                String status= json.optString("status");
-                String assignedTo= json.optString("assignedTo");
-                String documentsCount= json.optString("documentsCount");
-                String name= json.optString("name");
-                String fullAddress= json.optString("fullAddress");
-                String assignedToName= json.optString("assignedToName");
-                if (!type.equalsIgnoreCase(""))
-                {
-                    JSONArray jaa=new JSONArray(type);
-                    for (int j=0;j<jaa.length();j++)
-                    {
-                       String namee= jaa.getJSONObject(j).optString("name");
-                       if (status.equalsIgnoreCase(namee))
-                       {
-                           RequestModel requestModel=new RequestModel();
-                           requestModel.setName(name);
-                           requestModel.setAssignedTo(assignedTo);
-                           requestModel.setUserRequestDetailsId(userRequestDetailsId);
-                           requestModel.setAssignedToName(assignedToName);
-                           requestModel.setCustomerId(customerId);
-                           requestModel.setRequestedDate(requestedDate);
-                           requestModel.setStatus(status);
-                           requestModel.setFullAddress(fullAddress);
-                           requestModel.setDocumentsCount(documentsCount);
-                           al.add(requestModel);
-                       }
-                    }
+           }
 
-                }else {
-                    RequestModel requestModel=new RequestModel();
-                    requestModel.setName(name);
-                    requestModel.setAssignedTo(assignedTo);
-                    requestModel.setUserRequestDetailsId(userRequestDetailsId);
-                    requestModel.setAssignedToName(assignedToName);
-                    requestModel.setCustomerId(customerId);
-                    requestModel.setRequestedDate(requestedDate);
-                    requestModel.setStatus(status);
-                    requestModel.setFullAddress(fullAddress);
-                    requestModel.setDocumentsCount(documentsCount);
-                    al.add(requestModel);
-                }
+             RequestAdapter  requestAdapter=  new RequestAdapter(this,al,tv_notFound);
+               rv_notification.setAdapter(requestAdapter);
 
-
-            }
-           // ArrayList<RequestModel> sortedByName = new SortbyStatus(al).getSortedByStatus();
-            requestAdapter=  new RequestAdapter(this,al,tv_notFound);
-            rv_notification.setAdapter(requestAdapter);
-
+//           else if (type.equalsIgnoreCase("name"))
+//           {
+//               ArrayList<RequestModel> sortedByName = new SortbyStatus(al).getSortedByName();
+//               requestAdapter=  new RequestAdapter(this,sortedByName,tv_notFound);
+//               rv_notification.setAdapter(requestAdapter);
+//           }
+//           else
+//           {
+//               ArrayList<RequestModel> sortedByName = new SortbyStatus(al).getSortedByStatus();
+//               requestAdapter=  new RequestAdapter(this,sortedByName,tv_notFound);
+//               rv_notification.setAdapter(requestAdapter);
+//           }
             searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener()
             {
                 @Override
@@ -247,84 +254,6 @@ public class RequestActivity extends AppCompatActivity implements SaveView
             e.printStackTrace();
         }
     }
-
-//    private void assignData(String response,String type)
-//    {
-//        al.clear();
-//        try {
-//           // JSONObject js=new JSONObject(response);
-//           JSONArray ja= new JSONArray(response);
-//           if (ja.length()==0)
-//           {
-//               tv_req_notfound.setVisibility(View.VISIBLE);
-//           }
-//           else {
-//               tv_req_notfound.setVisibility(View.GONE);
-//           }
-//           for (int i=0;i<ja.length();i++)
-//           {
-//              JSONObject json= ja.getJSONObject(i);
-//               String userRequestDetailsId= json.optString("userRequestDetailsId");
-//               String requestedDate= json.optString("requestedDate");
-//               String customerId= json.optString("customerId");
-//               String status= json.optString("status");
-//               String assignedTo= json.optString("assignedTo");
-//               String documentsCount= json.optString("documentsCount");
-//               String name= json.optString("name");
-//               String fullAddress= json.optString("fullAddress");
-//               String assignedToName= json.optString("assignedToName");
-//               RequestModel requestModel=new RequestModel();
-//               requestModel.setName(name);
-//               requestModel.setAssignedTo(assignedTo);
-//               requestModel.setUserRequestDetailsId(userRequestDetailsId);
-//               requestModel.setAssignedToName(assignedToName);
-//               requestModel.setCustomerId(customerId);
-//               requestModel.setRequestedDate(requestedDate);
-//               requestModel.setStatus(status);
-//               requestModel.setFullAddress(fullAddress);
-//               requestModel.setDocumentsCount(documentsCount);
-//               al.add(requestModel);
-//
-//           }
-//           if (type.equalsIgnoreCase(""))
-//           {
-//               requestAdapter=  new RequestAdapter(this,al,tv_notFound);
-//               rv_notification.setAdapter(requestAdapter);
-//           }
-//           else if (type.equalsIgnoreCase("name"))
-//           {
-//               ArrayList<RequestModel> sortedByName = new SortbyStatus(al).getSortedByName();
-//               requestAdapter=  new RequestAdapter(this,sortedByName,tv_notFound);
-//               rv_notification.setAdapter(requestAdapter);
-//           }
-//           else
-//           {
-//               ArrayList<RequestModel> sortedByName = new SortbyStatus(al).getSortedByStatus();
-//               requestAdapter=  new RequestAdapter(this,sortedByName,tv_notFound);
-//               rv_notification.setAdapter(requestAdapter);
-//           }
-//
-//
-//            searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener()
-//            {
-//                @Override
-//                public boolean onQueryTextSubmit(String s)
-//                {
-//                    return false;
-//                }
-//
-//                @Override
-//                public boolean onQueryTextChange(String s)
-//                {
-//                    String text = s;
-//                    requestAdapter.filter(text);
-//                    return false;
-//                }
-//            });
-//        } catch (JSONException e) {
-//            e.printStackTrace();
-//        }
-//    }
 
     @Override
     public void onSaveFailure(String error) {
@@ -383,13 +312,14 @@ public class RequestActivity extends AppCompatActivity implements SaveView
         dialog.show();
     }
 
-    @Override
-    protected void onRestart()
-    {
-        super.onRestart();
-        getRequestData(sharedPrefs.getStatus().get(SharedPrefs.STATUS_DATA));
-    }
+//    @Override
+//    protected void onRestart()
+//    {
+//        super.onRestart();
+//        getRequestData("");
+//    }
 
+    @SuppressLint("SetTextI18n")
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -397,28 +327,73 @@ public class RequestActivity extends AppCompatActivity implements SaveView
         if (requestCode == LAUNCH_FILTER_ACTIVITY)
         {
             if(resultCode == Activity.RESULT_OK){
-                 result=data.getStringExtra("result");
-                if (result != null && !result.equalsIgnoreCase("[]"))
+                if (filterarrayList!=null)
                 {
-                    getRequestData(result);
+                    filterarrayList.clear();
                 }
-                else {
-                    getRequestData("");
-                }
+
+                result=data.getStringExtra("result");
+                dates=data.getStringExtra("date");
+
                 Log.e("Result",result);
+                Log.e("Dates",dates);
 
                 try {
                     JSONArray ja=new JSONArray(result);
-                    ArrayList<String> arrayList=new ArrayList<>();
-                    for (int i=0;i<ja.length();i++)
+                    JSONArray jaa=new JSONArray(dates);
+                    String startDate= jaa.getJSONObject(0).optString("startDate");
+                    String endDate= jaa.getJSONObject(0).optString("endDate");
+                    String[] elements = startDate.replaceAll("-", ",").split(",");
+                    String[] elements1 = endDate.replaceAll("-", ",").split(",");
+                    TextView tv_start=new TextView(this);
+                    TextView tv_end=new TextView(this);
+                    if (elements1.length==3)
                     {
-                        arrayList.add(ja.getJSONObject(i).optString("name"));
-                    }
-                    String s  ="'"+arrayList.toString().replace("[","").replace("]", "").replace(" ","").replace(",","','")+"'";
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
+                        tv_start.setText(""+elements[2]+"-"+elements[0]+"-"+elements[1]);
+                        tv_end.setText(""+elements1[2]+"-"+elements1[0]+"-"+elements1[1]);
+                    }else
                     {
-                        Log.e("Result",arrayList.stream().collect(Collectors.joining("','", "'", "'")));
+                        tv_end.setText("");
+                        tv_start.setText("");
                     }
+
+                    Log.e("status",""+ja.length());
+                    Log.e("DatesR",elements[0]);
+
+                    if (ja.length()==0&&startDate.isEmpty()&&endDate.isEmpty())
+                    {
+                       getRequestData("");
+                    }else {
+                        filterarrayList=new ArrayList<>();
+                        JSONArray jsonArray=new JSONArray();
+                        for (int i=0;i<ja.length();i++)
+                        {
+                            String item=ja.getJSONObject(i).optString("name");
+                            filterarrayList.add("\""+item+"\"");
+                            jsonArray.put(""+item+"");
+
+                        }
+                        Log.e("filter",""+jsonArray);
+                        Log.e("filter",""+tv_start.getText().toString());
+                        Log.e("filter",""+jsonArray);
+                        progressDialog.show();
+                        JSONObject js=new JSONObject();
+                        try {
+                            js.put("status",jsonArray);
+                            js.put("startDate",tv_start.getText().toString());
+                            js.put("endDate",tv_end.getText().toString());
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+                        //filterData(js);
+
+                        new SaveImpl(this).handleSave(js,"requestfilter?saasUserId="+id,"PUT","",token);
+
+                    }
+
+
+
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -432,8 +407,51 @@ public class RequestActivity extends AppCompatActivity implements SaveView
             if (resultCode == Activity.RESULT_CANCELED) {
                 //Write your code if there's no result
             }
+        }else if (requestCode==10)
+        {
+            getRequestData("");
+            //Toast.makeText(this, "Hii", Toast.LENGTH_SHORT).show();
         }
 
 
+    }
+
+    private void filterData(JSONObject js)
+    {
+        progressDialog.show();
+
+        final String requestBody=js.toString();
+        Log.e("Response",requestBody);
+        StringRequest stringRequest= new StringRequest(Request.Method.PUT, ApiConstants.BaseUrl + "requestfilter?saasUserId="+id, response -> {
+            progressDialog.dismiss();
+            Log.e("Response",response);
+        }, error -> {
+            ApiConstants.parseVolleyError(RequestActivity.this,error);
+            progressDialog.dismiss();
+            Log.e("Response",""+error);
+        })
+
+
+        {
+            @Override
+            public byte[] getBody() {
+                return requestBody.getBytes(StandardCharsets.UTF_8);
+            }
+            @Override
+            public String getBodyContentType()
+            {
+                return "application/json; charset=utf-8";
+            }
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError
+            {
+                HashMap<String,String> hm=new HashMap<>();
+                hm.put("Authorization","Bearer "+token);
+                hm.put("Content-Type", "application/json; charset=utf-8");
+                return hm;
+            }
+
+        };
+        MySingleton.getInstance(this).addToRequestQueue(stringRequest);
     }
 }

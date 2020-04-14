@@ -72,21 +72,25 @@ public class DocumentsAdapter extends BaseAdapter
           if (type.contains("pdf"))
           {
               doc_img.setImageResource(R.drawable.pdf);
-          }else if (type.contains("jpg")||type.contains("png"))
+          }else if (type.contains("jpg")||type.contains("png")||type.contains("jpeg"))
           {
               doc_img.setImageResource(R.drawable.photo);
           }
-          else if (type.contains("doc"))
+          else if (type.contains("doc")||type.contains("msword"))
           {
               doc_img.setImageResource(R.drawable.doc);
           }
-          else if (type.contains("txt"))
+          else if (type.contains("txt")||type.contains("plain"))
           {
               doc_img.setImageResource(R.drawable.document);
           }
-          else if (type.contains("zip"))
+          else if (type.contains("zip")||type.contains("x-zip-compressed"))
           {
               doc_img.setImageResource(R.drawable.compressed);
+          }
+          else if (type.contains("gif"))
+          {
+              doc_img.setImageResource(R.drawable.gif);
           }
 
 

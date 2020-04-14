@@ -127,47 +127,58 @@ public class ProfileActivity extends AppCompatActivity implements SaveView
         Log.e("ProfileStatus",response);
         if (code.equalsIgnoreCase("200"))
         {
-            try {
-                JSONObject jsonObject=new JSONObject(response);
-                String totalRequest=  jsonObject.optString("totalRequest");
-                String pendingRequests=  jsonObject.optString("pendingRequests");
-                String inprogressRequests=  jsonObject.optString("inprogressRequests");
-                String completedRequests=  jsonObject.optString("completedRequests");
-                JSONObject js=jsonObject.getJSONObject("user");
-                String profileImage=js.optString("profileImage");
-                String email=js.optString("email");
-                String phoneNumber=js.optString("phoneNumber");
-                String name=js.optString("name");
-                String roleName=js.optString("roleName");
-                String fullAddress=js.optString("fullAddress");
-                if (profileImage!=null)
-                {
-                    if (profileImage.equalsIgnoreCase(""))
-                    {
-                       iv.setImageResource(R.drawable.profile_d);
-                    }else {
-                        Picasso.get().load(profileImage).placeholder(R.drawable.profile_d).into(iv);
-                    }
-
-                }
-
-                tv_total.setText(""+totalRequest);
-                tv_pending.setText(""+pendingRequests);
-                tv_process.setText(""+inprogressRequests);
-                tv_complete.setText(""+completedRequests);
-                tv_name.setText(name);
-                tv_email.setText(email);
-                tv_mobile.setText(phoneNumber);
-                tv_type.setText(roleName);
-                tv_address.setText(fullAddress);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
+           assignData(response);
         }else if (code.equalsIgnoreCase("401"))
         {
             ApiConstants.logOut(this);
         }
 
+    }
+
+    private void assignData(String response) {
+        try {
+            JSONObject jsonObject=new JSONObject(response);
+            String totalRequest=  jsonObject.optString("totalRequest");
+            String pendingRequests=  jsonObject.optString("pendingRequests");
+            String inprogressRequests=  jsonObject.optString("inprogressRequests");
+            String completedRequests=  jsonObject.optString("completedRequests");
+            JSONObject js=jsonObject.getJSONObject("user");
+            String profileImage=js.optString("profileImage");
+            String email=js.optString("email");
+            String phoneNumber=js.optString("phoneNumber");
+            String name=js.optString("name");
+            String roleName=js.optString("roleName");
+            String fullAddress=js.optString("fullAddress");
+            String countryCode= js.optString("countryCode");
+            if (profileImage!=null)
+            {
+                if (profileImage.equalsIgnoreCase(""))
+                {
+                    iv.setImageResource(R.drawable.profile_d);
+                }else {
+                    Picasso.get().load(profileImage).placeholder(R.drawable.profile_d).into(iv);
+                }
+
+            }
+
+            tv_total.setText(""+totalRequest);
+            tv_pending.setText(""+pendingRequests);
+            tv_process.setText(""+inprogressRequests);
+            tv_complete.setText(""+completedRequests);
+            tv_name.setText(name);
+            tv_email.setText(email);
+            if (countryCode.contains("+"))
+            {
+                tv_mobile.setText(countryCode+" "+phoneNumber);
+            }else {
+                tv_mobile.setText("+"+countryCode+" "+phoneNumber);
+            }
+
+            tv_type.setText(roleName);
+            tv_address.setText(fullAddress);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

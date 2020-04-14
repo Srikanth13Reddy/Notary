@@ -4,6 +4,8 @@
 
     <item android:title="@string/read_all"
         app:showAsAction="always"
-        android:id="@+id/readAll"/>
+        android:id="@+id/readAll">
+
+    </item>
 
 </menu>

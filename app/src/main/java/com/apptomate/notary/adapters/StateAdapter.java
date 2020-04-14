@@ -25,7 +25,7 @@ public class StateAdapter extends RecyclerView.Adapter<StateAdapter.MyHolder>
     AppCompatTextView tv_notfound;
     Context context;
     public EventListener eventListener;
-    private ArrayList<StateModel> imageModelArrayList;
+    private ArrayList<StateModel> statelist;
     AlertDialog alertDialog;
 
     public interface EventListener
@@ -34,11 +34,11 @@ public class StateAdapter extends RecyclerView.Adapter<StateAdapter.MyHolder>
 
     }
 
-    public StateAdapter(ArrayList<StateModel> imageModelArrayList, Context context, AppCompatTextView tv_notFound, EventListener eventListener, AlertDialog ad) {
+    public StateAdapter(ArrayList<StateModel> statelist, Context context, AppCompatTextView tv_notFound, EventListener eventListener, AlertDialog ad) {
         this.context = context;
-        this.imageModelArrayList = imageModelArrayList;
+        this.statelist = statelist;
         this.arrayList = new ArrayList<StateModel>();
-        this.arrayList.addAll(imageModelArrayList);
+        this.arrayList.addAll(statelist);
         this.tv_notfound=tv_notFound;
         this.eventListener=eventListener;
         alertDialog=ad;
@@ -56,39 +56,39 @@ public class StateAdapter extends RecyclerView.Adapter<StateAdapter.MyHolder>
 
     @Override
     public void onBindViewHolder(@NonNull MyHolder holder, int position) {
-        if (imageModelArrayList.get(position).getStateName()!=null)
+        if (statelist.get(position).getStateName()!=null)
         {
-            holder.tv_country.setText(imageModelArrayList.get(position).getStateName());
+            holder.tv_country.setText(statelist.get(position).getStateName());
         }
         holder.itemView.setOnClickListener(new View.OnClickListener()
         {
             @Override
             public void onClick(View v) {
                 alertDialog.cancel();
-                eventListener.onEventState(imageModelArrayList.get(position).getStateId(),imageModelArrayList.get(position).getStateName());
-                //Toast.makeText(context, ""+imageModelArrayList.get(position).getName(), Toast.LENGTH_SHORT).show();
+                eventListener.onEventState(statelist.get(position).getStateId(),statelist.get(position).getStateName());
+                //Toast.makeText(context, ""+statelist.get(position).getName(), Toast.LENGTH_SHORT).show();
             }
         });
     }
 
     @Override
     public int getItemCount() {
-        return imageModelArrayList.size();
+        return statelist.size();
     }
 
     public void filter(String charText) {
         charText = charText.toLowerCase(Locale.getDefault());
-        imageModelArrayList.clear();
+        statelist.clear();
         if (charText.length() == 0) {
-            imageModelArrayList.addAll(arrayList);
+            statelist.addAll(arrayList);
         } else {
             for (StateModel wp : arrayList) {
                 if (wp.getStateName().toLowerCase(Locale.getDefault()).contains(charText)) {
-                    imageModelArrayList.add(wp);
+                    statelist.add(wp);
                 }
             }
         }
-        if (imageModelArrayList.size()==0)
+        if (statelist.size()==0)
         {
             tv_notfound.setVisibility(View.VISIBLE);
         }

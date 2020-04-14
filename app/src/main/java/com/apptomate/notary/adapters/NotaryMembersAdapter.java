@@ -121,11 +121,7 @@ public class NotaryMembersAdapter extends RecyclerView.Adapter<NotaryMembersAdap
         alb.setView(v);
        AlertDialog alertDialog= alb.create();
 
-        Animation transition_in_view = AnimationUtils.loadAnimation(context, R.anim.customer_anim);//customer animation appearance
-        v.setAnimation( transition_in_view );
-        v.startAnimation( transition_in_view );
-        Objects.requireNonNull(alertDialog.getWindow()).setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-        alertDialog.getWindow().getAttributes().windowAnimations = R.style.DialogAnimation;
+         ApiConstants.setAnimation(context,v,alertDialog);
 
               alertDialog .show();
 

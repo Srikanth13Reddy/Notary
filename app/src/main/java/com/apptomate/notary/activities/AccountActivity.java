@@ -10,6 +10,7 @@ import androidx.appcompat.widget.SearchView;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.os.Bundle;
@@ -22,6 +23,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.LinearLayout;
@@ -38,8 +40,10 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.apptomate.notary.R;
 import com.apptomate.notary.adapters.CountryAdapter;
+import com.apptomate.notary.adapters.CountryCodeAdapter;
 import com.apptomate.notary.adapters.StateAdapter;
 import com.apptomate.notary.interfaces.SaveView;
+import com.apptomate.notary.models.CountryCodeModel;
 import com.apptomate.notary.models.CountryModel;
 import com.apptomate.notary.models.StateModel;
 import com.apptomate.notary.utils.ApiConstants;
@@ -56,7 +60,7 @@ import java.util.Map;
 import java.util.Objects;
 
 
-public class AccountActivity extends AppCompatActivity implements CountryAdapter.EventListener,StateAdapter.EventListener, SaveView
+public class AccountActivity extends AppCompatActivity implements CountryAdapter.EventListener,StateAdapter.EventListener, SaveView,CountryCodeAdapter.EventListener
 {
     boolean password=false;
     boolean phone=false;
@@ -65,7 +69,7 @@ public class AccountActivity extends AppCompatActivity implements CountryAdapter
     LinearLayout ll_pass,change_phone_ll,change_address_ll;
     RelativeLayout rl_pass,rl_phone,rl_address;
     ProgressDialog progressDialog;
-    AppCompatEditText et_oldpass,et_new_pass,et_confirm_pass,act_phone,et_street,et_apartment,et_city,et_country,et_state,et_postalcode;
+    AppCompatEditText et_oldpass,et_new_pass,et_confirm_pass,act_phone,act_Cphone,et_street,et_apartment,et_city,et_country,et_state,et_postalcode;
     AppCompatButton acct_save_pass;
     SharedPrefs sharedPrefs;
     String id,token;
@@ -106,6 +110,7 @@ public class AccountActivity extends AppCompatActivity implements CountryAdapter
     {
         tv_country_code=new TextView(this);
         tv_state_code=new TextView(this);
+        act_Cphone= findViewById(R.id.act_Cphone);
         et_street= findViewById(R.id.et_street);
         et_apartment= findViewById(R.id.et_apartment);
         et_city= findViewById(R.id.et_city);
@@ -320,6 +325,7 @@ public class AccountActivity extends AppCompatActivity implements CountryAdapter
             AlertDialog.Builder alb=new AlertDialog.Builder(this);
             alb.setView(v);
             ad=alb.create();
+            ApiConstants.setAnimation(this,v,ad);
             getStateData(rv_search,country_search,ad,tv_notFound);
         }
 
@@ -421,77 +427,8 @@ public class AccountActivity extends AppCompatActivity implements CountryAdapter
         } catch (JSONException e) {
             e.printStackTrace();
         }
+        new SaveImpl(this).handleSave(js,"passwordchange?saasUserId="+id,"POST","password",token);
 
-        final String requestBody=js.toString();
-
-        StringRequest stringRequest= new StringRequest(Request.Method.POST, ApiConstants.BaseUrl + "passwordchange?saasUserId="+id, response -> {
-            progressDialog.dismiss();
-            Log.e("Response",response);
-
-            if (response.equalsIgnoreCase("{\"error\":\"Invalid Password\"}"))
-            {
-                try {
-                    JSONObject js1 =new JSONObject(response);
-                    if (js1.optString("error").equalsIgnoreCase("Invalid Password"))
-                    {
-                        act_old_ps_check.setVisibility(View.GONE);
-                        et_oldpass.setError("Invalid Password");
-                        et_oldpass.requestFocus();
-                    }else {
-                        Toast.makeText(AccountActivity.this, ""+ js1.optString("error"), Toast.LENGTH_SHORT).show();
-
-                    }
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-            else {
-                try {
-                    JSONObject js1 =new JSONObject(response);
-                    String status= js1.optString("status");
-                    if (status.equalsIgnoreCase("Success"))
-                    {
-                        et_oldpass.setText("");
-                        et_confirm_pass.setText("");
-                        et_new_pass.setText("");
-                        Toast.makeText(AccountActivity.this, ""+ js1.optString("message"), Toast.LENGTH_SHORT).show();
-                    }
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-
-
-
-
-        }, error -> {
-            ApiConstants.parseVolleyError(AccountActivity.this,error);
-            progressDialog.dismiss();
-            Log.e("Response",""+error);
-        })
-
-
-        {
-            @Override
-            public byte[] getBody() {
-                return requestBody.getBytes(StandardCharsets.UTF_8);
-            }
-            @Override
-            public String getBodyContentType()
-            {
-                return "application/json; charset=utf-8";
-            }
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError
-            {
-                HashMap<String,String> hm=new HashMap<>();
-                hm.put("Authorization","Bearer "+token);
-                hm.put("Content-Type", "application/json; charset=utf-8");
-                return hm;
-            }
-
-        };
-        MySingleton.getInstance(this).addToRequestQueue(stringRequest);
     }
 
     public void savePass(View view)
@@ -533,14 +470,15 @@ public class AccountActivity extends AppCompatActivity implements CountryAdapter
             //Snackbar.make(root," Confirm Password not match!!!",Snackbar.LENGTH_SHORT).show();
         }
         else {
+            hideKeyboard();
             changePassword(id,et_oldpass.getText().toString(),et_confirm_pass.getText().toString());
         }
     }
 
       void showCountryList()
     {
-      LayoutInflater layoutInflater= (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
-      View v=layoutInflater.inflate(R.layout.country_search,null,false);
+       LayoutInflater layoutInflater= (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
+       View v=layoutInflater.inflate(R.layout.country_search,null,false);
         RecyclerView rv_search=v.findViewById(R.id.rv_search);
         AppCompatTextView tv_notFound=v.findViewById(R.id.tv_notFound);
         SearchView country_search=v.findViewById(R.id.country_search);
@@ -548,6 +486,7 @@ public class AccountActivity extends AppCompatActivity implements CountryAdapter
         AlertDialog.Builder alb=new AlertDialog.Builder(this);
         alb.setView(v);
         ad=alb.create();
+        ApiConstants.setAnimation(this,v,ad);
         getCounteryData(rv_search,country_search,ad,tv_notFound);
       //  ad.show();
     }
@@ -659,6 +598,7 @@ public class AccountActivity extends AppCompatActivity implements CountryAdapter
             et_postalcode.requestFocus();
         }
         else {
+            hideKeyboard();
             changeAddressData();
         }
     }
@@ -693,78 +633,35 @@ public class AccountActivity extends AppCompatActivity implements CountryAdapter
         {
             act_phone.setError("Enter Phone Number");
             act_phone.requestFocus();
+        }else if (act_Cphone.getText().toString().isEmpty())
+        {
+            act_Cphone.setError("Choose country code");
+            act_Cphone.requestFocus();
+        }
+        else if (act_phone.getText().toString().length()<10)
+        {
+            act_phone.setError("Invalid Phone Number");
+            act_phone.requestFocus();
         }
         else {
-            savePhoneNumber(act_phone.getText().toString());
+            hideKeyboard();
+            savePhoneNumber(act_phone.getText().toString(),act_Cphone.getText().toString());
         }
     }
 
-    private void savePhoneNumber(String phone)
+    private void savePhoneNumber(String phone,String code)
     {
         progressDialog.show();
         JSONObject js=new JSONObject();
         try {
             js.put("phoneNumber",phone);
+            js.put("countryCode",code);
         } catch (JSONException e) {
             e.printStackTrace();
         }
 
-        final String requestBody=js.toString();
-        StringRequest stringRequest= new StringRequest(Request.Method.PUT, ApiConstants.BaseUrl + "saasuser?saasUserId="+id, response -> {
-            progressDialog.dismiss();
-            Log.e("ResponsePhone",response);
+        new SaveImpl(this).handleSave(js,"saasuser?saasUserId="+id,"PUT","savePhone",token);
 
-            if (response.equalsIgnoreCase("{\"error\":\"Invalid Password\"}"))
-            {
-                try {
-                    JSONObject js1 =new JSONObject(response);
-                    Toast.makeText(AccountActivity.this, ""+ js1.optString("error"), Toast.LENGTH_SHORT).show();
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-            else {
-                try {
-                    JSONObject js1 =new JSONObject(response);
-                    String status= js1.optString("status");
-                    if (status.equalsIgnoreCase("Success"))
-                    {
-                       // act_phone.setText("");
-                        Toast.makeText(AccountActivity.this, "Phone number updated", Toast.LENGTH_LONG).show();
-                    }
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-
-
-
-
-        }, error -> {
-            progressDialog.dismiss();
-            ApiConstants.parseVolleyError(AccountActivity.this,error);
-            Log.e("ResponsePhone",""+error);
-        })
-
-        {
-            @Override
-            public byte[] getBody() {
-                return requestBody.getBytes(StandardCharsets.UTF_8);
-            }
-            @Override
-            public String getBodyContentType() {
-                return "application/json; charset=utf-8";
-            }
-
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError
-            {
-                HashMap<String,String> hm=new HashMap<>();
-                hm.put("Authorization","Bearer "+token);
-                return hm;
-            }
-        };
-        MySingleton.getInstance(this).addToRequestQueue(stringRequest);
     }
 
     @Override
@@ -777,24 +674,37 @@ public class AccountActivity extends AppCompatActivity implements CountryAdapter
     public void onSaveSucess(String code, String response, String type)
     {
         progressDialog.dismiss();
-        Log.e("ResData",response);
+        Log.e("ResData",response+"\n"+type);
         if (code.equalsIgnoreCase("200"))
         {
-            try {
-                JSONObject js=new JSONObject(response);
-                if (js.optString("status").equalsIgnoreCase("Success"))
-                {
-                    Toast.makeText(this, "Address Updated Successfully", Toast.LENGTH_SHORT).show();
-//                    et_street.setText("");
-//                    et_apartment.setText("");
-//                    et_city.setText("");
-//                    et_state.setText("");
-//                    et_country.setText("");
-//                    et_postalcode.setText("");
+            if (type.equalsIgnoreCase("userData"))
+           {
+            assignDatatoFields(response);
+           }else {
+                try {
+                    JSONObject js=new JSONObject(response);
+                    if (js.optString("status").equalsIgnoreCase("Success"))
+                    {
+                        if (type.equalsIgnoreCase("savePhone"))
+                        {
+                            Toast.makeText(this, "Phone Number Updated Successfully", Toast.LENGTH_SHORT).show();
+                        }else if (type.equalsIgnoreCase("password"))
+                        {
+                            Toast.makeText(this, "Password Updated Successfully", Toast.LENGTH_SHORT).show();
+                        }
+                        else {
+                            Toast.makeText(this, "Address Updated Successfully", Toast.LENGTH_SHORT).show();
+                        }
+
+                    }else {
+                        Toast.makeText(this, ""+js.optString("message"), Toast.LENGTH_SHORT).show();
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
                 }
-            } catch (JSONException e) {
-                e.printStackTrace();
             }
+
+
         }else if (code.equalsIgnoreCase("401"))
         {
             ApiConstants.logOut(this);
@@ -811,32 +721,10 @@ public class AccountActivity extends AppCompatActivity implements CountryAdapter
     public void getUserData()
     {
         progressDialog.show();
-        StringRequest stringRequest=new StringRequest(Request.Method.GET, ApiConstants.BaseUrl+"saasuser?saasUserId=" + id, response -> {
-            progressDialog.dismiss();
-         assignDatatoFields(response);
-        }, error -> {
-             progressDialog.dismiss();
-             ApiConstants.parseVolleyError(AccountActivity.this,error);
-            //Toast.makeText(AccountActivity.this, ""+error, Toast.LENGTH_SHORT).show();
-        })
-        {
-            @Override
-            protected Response<String> parseNetworkResponse(NetworkResponse response) {
-                return super.parseNetworkResponse(response);
-
-            }
-
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError
-            {
-                HashMap<String,String> hm=new HashMap<>();
-                hm.put("Authorization","Bearer "+token);
-                return hm;
-            }
-        };
-        MySingleton.getInstance(this).addToRequestQueue(stringRequest);
+        new SaveImpl(this).handleSave(new JSONObject(),"saasuser?saasUserId=" + id,"GET","userData",token);
     }
 
+    @SuppressLint("SetTextI18n")
     private void assignDatatoFields(String response)
     {
         try {
@@ -851,6 +739,7 @@ public class AccountActivity extends AppCompatActivity implements CountryAdapter
             String postalCode=js.optString("postalCode");
             String stateName=js.optString("stateName");
             String countryName=js.optString("countryName");
+            String countryCode=js.optString("countryCode");
             act_phone.setText(phoneNumber);
             et_street.setText(street);
             et_postalcode.setText(postalCode);
@@ -860,11 +749,98 @@ public class AccountActivity extends AppCompatActivity implements CountryAdapter
             tv_state_code.setText(stateId);
             et_country.setText(countryName);
             et_state.setText(stateName);
+           // act_Cphone.setText("+"+countryCode);
+            if (countryCode.contains("+"))
+            {
+                act_Cphone.setText(countryCode);
+            }else {
+                act_Cphone.setText("+"+countryCode);
+            }
 
         } catch (JSONException e) {
             e.printStackTrace();
         }
     }
 
+    public void hideKeyboard()
+    {
+        InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+        //Find the currently focused view, so we can grab the correct window token from it.
+        View view = getCurrentFocus();
+        //If no view currently has focus, create a new one, just so we can grab a window token from it
+        if (imm != null) {
+            if (view != null) {
+                imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+            }
+        }
+    }
 
+
+    public void getCode(View view)
+    {
+
+        LayoutInflater layoutInflater= (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
+        View v=layoutInflater.inflate(R.layout.countrycodesearch_layout,null,false);
+        RecyclerView rv_search=v.findViewById(R.id.rv_search_);
+        AppCompatTextView tv_notFound=v.findViewById(R.id.tv_notFound);
+        SearchView country_search=v.findViewById(R.id.country_search_);
+        country_search.setIconifiedByDefault(false);
+        AlertDialog.Builder alb=new AlertDialog.Builder(this);
+        alb.setView(v);
+       AlertDialog ad=alb.create();
+        ApiConstants.setAnimation(this,v,ad);
+        getCounteryCode(rv_search,country_search,ad,tv_notFound);
+
+
+    }
+
+    private void getCounteryCode(RecyclerView rv_search, SearchView country_search, AlertDialog ad, AppCompatTextView tv_notFound)
+    {
+        ad.show();
+        LinearLayoutManager llm = new LinearLayoutManager(this);
+        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(rv_search.getContext(), llm.getOrientation());
+        rv_search.addItemDecoration(dividerItemDecoration);
+        rv_search.setLayoutManager(llm);
+        ArrayList<CountryCodeModel> arrayList=new ArrayList<>();
+        try {
+            JSONObject js=new JSONObject(ApiConstants.Country_Code);
+            JSONArray ja= js.getJSONArray("countries");
+            for (int i=0;i<ja.length();i++)
+            {
+                JSONObject json= ja.getJSONObject(i);
+                String code=json.getString("code");
+                String name=json.getString("name");
+                CountryCodeModel countryCodeModel=new CountryCodeModel();
+                countryCodeModel.setCountrycode(code);
+                countryCodeModel.setCountryname(name);
+                arrayList.add(countryCodeModel);
+            }
+            CountryCodeAdapter countryAdapter=new CountryCodeAdapter(arrayList,this,tv_notFound,this,ad);
+
+            rv_search.setAdapter(countryAdapter);
+
+            country_search.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+                @Override
+                public boolean onQueryTextSubmit(String query) {
+                    return false;
+                }
+
+                @Override
+                public boolean onQueryTextChange(String newText) {
+                    String text = newText;
+                    countryAdapter.filter(text);
+                    return false;
+                }
+            });
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void onCodeEvent(String Countrycode, String name) {
+        act_Cphone.setText(Countrycode);
+        //act_phone.setText(name);
+    }
 }

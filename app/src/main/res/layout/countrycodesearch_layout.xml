@@ -16,7 +16,7 @@
             android:layout_height="45dp">
             <androidx.appcompat.widget.SearchView
                 android:layout_width="match_parent"
-                android:id="@+id/state_search"
+                android:id="@+id/country_search_"
                 app:queryHint="Search...."
                 android:layout_height="wrap_content"/>
 
@@ -25,7 +25,7 @@
         <androidx.recyclerview.widget.RecyclerView
             android:layout_width="match_parent"
             android:layout_margin="12dp"
-            android:id="@+id/rv_state_search"
+            android:id="@+id/rv_search_"
             android:layout_height="match_parent"/>
 
     </LinearLayout>

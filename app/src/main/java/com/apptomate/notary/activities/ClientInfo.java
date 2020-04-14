@@ -17,19 +17,23 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.PopupWindow;
 import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
@@ -100,8 +104,7 @@ public class ClientInfo extends AppCompatActivity implements SaveView , PopupMen
             }
         }
     };
-
-
+    private String assignTo;
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -119,6 +122,7 @@ public class ClientInfo extends AppCompatActivity implements SaveView , PopupMen
             rId= b.getString("rId");
             status= b.getString("status");
             assignToName=b.getString("notary");
+            assignTo=b.getString("notaryId");
             getRequestData();
         }
 
@@ -133,12 +137,12 @@ public class ClientInfo extends AppCompatActivity implements SaveView , PopupMen
             public void onClick(View v) {
                 Intent i=new Intent(ClientInfo.this,NotariesListActivity.class);
                 i.putExtra("rId",rId);
+                i.putExtra("assignedTo",assignTo);
                 startActivity(i);
                 overridePendingTransition(R.anim.right_in, R.anim.left_out);
             }
         });
     }
-
     private void visibleViews()
     {
         if (roleId!=null&&roleId.equalsIgnoreCase("1")&&status.equalsIgnoreCase("New")&&assignToName.isEmpty())
@@ -172,7 +176,6 @@ public class ClientInfo extends AppCompatActivity implements SaveView , PopupMen
            // edit_iv_status.setVisibility(View.VISIBLE);
         }
     }
-
     private void getLoginData()
     {
         sharedPrefs=new SharedPrefs(this);
@@ -206,13 +209,11 @@ public class ClientInfo extends AppCompatActivity implements SaveView , PopupMen
 
 
     }
-
     public void getRequestData()
     {
         progressDialog.show();
         new SaveImpl(this).handleSave(new JSONObject(),"requestbyid?requestDetailsId="+rId,"GET","",token);
     }
-
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
 
@@ -222,15 +223,12 @@ public class ClientInfo extends AppCompatActivity implements SaveView , PopupMen
         }
         return true;
     }
-
-
     @Override
     public void onBackPressed()
     {
         super.onBackPressed();
         overridePendingTransition(R.anim.left_in, R.anim.right_out);
     }
-
     @SuppressLint("SetTextI18n")
     @Override
     public void onSaveSucess(String code, String response,String type)
@@ -242,125 +240,155 @@ public class ClientInfo extends AppCompatActivity implements SaveView , PopupMen
         verified.clear();
         unverified.clear();
 
-        if (code.equalsIgnoreCase("200"))
+        if (type.equalsIgnoreCase("status"))
         {
             try {
                 JSONObject js=new JSONObject(response);
-                JSONObject jsonObject= js.getJSONObject("request");
-                String fullAddress= jsonObject.optString("fullAddress");
-                String name= jsonObject.optString("name");
-                 userRequestDetailsId= jsonObject.optString("userRequestDetailsId");
-                tv_client_shipping_address.setText(toTitleCase(fullAddress));
-                tv_client_name.setText(toTitleCase(name));
-                String documents= js.optString("documents");
-                String documentdetails= js.optString("documentdetails");
-                JSONArray jaa=new JSONArray(documentdetails);
-                for (int j=0;j<jaa.length();j++)
+                String status= js.optString("status");
+                if (status.equalsIgnoreCase("Success"))
                 {
-                   JSONObject json= jaa.getJSONObject(j);
-                    String documentDetailsId= json.optString("documentDetailsId");
-                    String serviceName= json.optString("serviceName");
-                    String documentName= json.optString("documentName");
-                    String stateName= json.optString("stateName");
-                    String status= json.optString("status");
-                    if (status.equalsIgnoreCase("Unverified"))
+                    finish();
+                }else {
+                    Toast.makeText(this, ""+js.optString("message"), Toast.LENGTH_SHORT).show();
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }else {
+
+            if (code.equalsIgnoreCase("200"))
+            {
+                assignData(response);
+            }
+            else if (code.equalsIgnoreCase("500"))
+            {
+                try {
+                    JSONObject js=new JSONObject(response);
+                    Toast.makeText(this, ""+js.optString("error"), Toast.LENGTH_SHORT).show();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+
+        }
+
+
+
+    }
+
+    private void assignData(String response)
+    {
+        ArrayList<DocumentsModel> arrayList=new ArrayList<>();
+        ArrayList<DocumentsDetailsModel> arrayList1=new ArrayList<>();
+        verified.clear();
+        unverified.clear();
+        try {
+            JSONObject js=new JSONObject(response);
+            JSONObject jsonObject= js.getJSONObject("request");
+            String fullAddress= jsonObject.optString("fullAddress");
+            String name= jsonObject.optString("name");
+            userRequestDetailsId= jsonObject.optString("userRequestDetailsId");
+            tv_client_shipping_address.setText(toTitleCase(fullAddress));
+            tv_client_name.setText(toTitleCase(name));
+            String documents= js.optString("documents");
+            String documentdetails= js.optString("documentdetails");
+            JSONArray jaa=new JSONArray(documentdetails);
+            for (int j=0;j<jaa.length();j++)
+            {
+                JSONObject json= jaa.getJSONObject(j);
+                String documentDetailsId= json.optString("documentDetailsId");
+                String serviceName= json.optString("serviceName");
+                String documentName= json.optString("documentName");
+                String stateName= json.optString("stateName");
+                String status= json.optString("status");
+                if (status.equalsIgnoreCase("Unverified"))
+                {
+                    unverified.add(status);
+                }else if (status.equalsIgnoreCase("Verified"))
+                {
+                    verified.add(status);
+                }
+
+                DocumentsDetailsModel detailsModel=new DocumentsDetailsModel();
+                detailsModel.setDocumentDetailsId(documentDetailsId);
+                detailsModel.setServiceName(serviceName);
+                detailsModel.setStateName(stateName);
+                detailsModel.setStatus(status);
+                detailsModel.setDocumentName(documentName);
+                arrayList1.add(detailsModel);
+            }
+            DocumentsTypeAdapter typeAdapter=new DocumentsTypeAdapter(arrayList1,this,token,status);
+            JSONArray ja=new JSONArray(documents);
+            for (int i=0;i<ja.length();i++)
+            {
+                JSONObject json= ja.getJSONObject(i);
+                String fileName= json.optString("fileName");
+                String url= json.optString("url");
+                String fileType= json.optString("fileType");
+                //String status= json.optString("status");
+                // String stateId= json.optString("stateId");
+                // String serviceId= json.optString("serviceId");
+                String userDocumentId= json.optString("requestId");
+                String userRequestDetailsId= json.optString("documentId");
+                DocumentsModel documentsModel=new DocumentsModel();
+                documentsModel.setFileName(fileName);
+                documentsModel.setUrl(url);
+                documentsModel.setStatus(status);
+                documentsModel.setFileType(fileType);
+                //  documentsModel.setStateId(stateId);
+                // documentsModel.setServiceId(serviceId);
+                documentsModel.setUserDocumentId(userDocumentId);
+                documentsModel.setUserRequestDetailsId(userRequestDetailsId);
+                arrayList.add(documentsModel);
+            }
+            DocumentsAdapter documentsAdapter=new DocumentsAdapter(this,arrayList);
+            lv_documents.setAdapter(documentsAdapter);
+            lv_documents1.setAdapter(typeAdapter);
+
+            lv_documents.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id)
+                {
+                    String type= arrayList.get(position).getFileType();
+                    String url= arrayList.get(position).getUrl();
+                    String name1= arrayList.get(position).getFileName();
+                    if (type.contains("doc")||type.contains("zip")||type.contains("pdf"))
                     {
-                        unverified.add(status);
-                    }else if (status.equalsIgnoreCase("Verified"))
+                        AlertDialog.Builder alb=new AlertDialog.Builder(ClientInfo.this);
+                        alb.setMessage("Do you want to download "+name1);
+                        alb.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which)
+                            {
+                                //beginDownload(url,name1);
+                                galleryPermission(url,name1);
+                            }
+                        });
+                        alb.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                            }
+                        });
+                        alb.create().show();
+                    } else if (type.contains("png")||type.contains("jpg")||type.contains("txt"))
                     {
-                        verified.add(status);
+                        startActivity(new Intent(Intent.ACTION_VIEW,Uri.parse(
+                                url)));
                     }
-
-                    DocumentsDetailsModel detailsModel=new DocumentsDetailsModel();
-                    detailsModel.setDocumentDetailsId(documentDetailsId);
-                    detailsModel.setServiceName(serviceName);
-                    detailsModel.setStateName(stateName);
-                    detailsModel.setStatus(status);
-                    detailsModel.setDocumentName(documentName);
-                    arrayList1.add(detailsModel);
-                }
-                DocumentsTypeAdapter typeAdapter=new DocumentsTypeAdapter(arrayList1,this,token,status);
-                JSONArray ja=new JSONArray(documents);
-                for (int i=0;i<ja.length();i++)
-                {
-                    JSONObject json= ja.getJSONObject(i);
-                    String fileName= json.optString("fileName");
-                    String url= json.optString("url");
-                    String fileType= json.optString("fileType");
-                    //String status= json.optString("status");
-                   // String stateId= json.optString("stateId");
-                   // String serviceId= json.optString("serviceId");
-                    String userDocumentId= json.optString("requestId");
-                    String userRequestDetailsId= json.optString("documentId");
-                    DocumentsModel documentsModel=new DocumentsModel();
-                    documentsModel.setFileName(fileName);
-                    documentsModel.setUrl(url);
-                    documentsModel.setStatus(status);
-                    documentsModel.setFileType(fileType);
-                  //  documentsModel.setStateId(stateId);
-                   // documentsModel.setServiceId(serviceId);
-                    documentsModel.setUserDocumentId(userDocumentId);
-                    documentsModel.setUserRequestDetailsId(userRequestDetailsId);
-                    arrayList.add(documentsModel);
-                }
-                DocumentsAdapter documentsAdapter=new DocumentsAdapter(this,arrayList);
-                lv_documents.setAdapter(documentsAdapter);
-                lv_documents1.setAdapter(typeAdapter);
-
-                lv_documents.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                    @Override
-                    public void onItemClick(AdapterView<?> parent, View view, int position, long id)
-                    {
-                        String type= arrayList.get(position).getFileType();
-                        String url= arrayList.get(position).getUrl();
-                        String name1= arrayList.get(position).getFileName();
-                        if (type.contains("doc")||type.contains("zip")||type.contains("pdf"))
-                        {
-                            AlertDialog.Builder alb=new AlertDialog.Builder(ClientInfo.this);
-                            alb.setMessage("Do you want to download "+name1);
-                            alb.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which)
-                                {
-                                    //beginDownload(url,name1);
-                                    galleryPermission(url,name1);
-                                }
-                            });
-                            alb.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    dialog.dismiss();
-                                }
-                            });
-                            alb.create().show();
-                        } else if (type.contains("png")||type.contains("jpg")||type.contains("txt"))
-                        {
-                            startActivity(new Intent(Intent.ACTION_VIEW,Uri.parse(
-                                    url)));
-                        }
-                        else {
+                    else {
 //                            Intent i=new Intent(ClientInfo.this, DocumentViewActivity.class);
 //                           i.putExtra("url",arrayList.get(position).getUrl());
 //                          startActivity(i);
 
-                            startActivity(new Intent(Intent.ACTION_VIEW,Uri.parse(url)));
-                        }
+                        startActivity(new Intent(Intent.ACTION_VIEW,Uri.parse(url)));
                     }
-                });
+                }
+            });
 
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-        }else if (code.equalsIgnoreCase("500"))
-        {
-            try {
-                JSONObject js=new JSONObject(response);
-                Toast.makeText(this, ""+js.optString("error"), Toast.LENGTH_SHORT).show();
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
-
     }
 
     @Override
@@ -370,6 +398,7 @@ public class ClientInfo extends AppCompatActivity implements SaveView , PopupMen
     }
     public void edit(View view)
     {
+      //  showPopup(view);
 
 
         PopupMenu popup = new PopupMenu(this, view);
@@ -420,29 +449,7 @@ public class ClientInfo extends AppCompatActivity implements SaveView , PopupMen
        }
         popup.show();
 
-//        String[] names={"Reject","Pending","InProgress","Complete"};
-//        ArrayAdapter arrayAdapter=new ArrayAdapter(this,android.R.layout.activity_list_item,names);
-//       LayoutInflater layoutInflater= (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
-//       View v=layoutInflater.inflate(R.layout.edit_screen,null,false);
-//      TextView tv=v.findViewById(R.id.tv);
-//      // listView.setAdapter(arrayAdapter);
-//
-//        new SimpleTooltip.Builder(this)
-//                .anchorView(view)
-//              //  .text(al.get(position).getDescription())
-//                .gravity(Gravity.TOP)
-//                .dismissOnOutsideTouch(true)
-//                .contentView(R.layout.edit_screen)
-//                .dismissOnInsideTouch(false)
-//                .animated(true)
-//                .build()
-//                .show();
-//        tv.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                Toast.makeText(ClientInfo.this, "Hiii", Toast.LENGTH_SHORT).show();
-//            }
-//        });
+
     }
     @Override
     public boolean onMenuItemClick(MenuItem item)
@@ -497,21 +504,27 @@ public class ClientInfo extends AppCompatActivity implements SaveView , PopupMen
                 return false;
         }
     }
-
     private void showAlertDialog()
     {
         AlertDialog.Builder alb=new AlertDialog.Builder(this);
-        alb.setMessage("Please Verify Documents");
+        alb.setMessage("Please verify the toggle button");
+        alb.setCancelable(false);
+        alb.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
         alb.create().show();
     }
-
     private void showAlertDialogPending()
     {
         AlertDialog.Builder alb=new AlertDialog.Builder(this);
-        alb.setMessage("Please Verify Documents");
+        alb.setCancelable(false);
+        alb.setPositiveButton("Ok", (dialog, which) -> dialog.dismiss());
+        alb.setMessage("Please verify the toggle button");
         alb.create().show();
     }
-
     private void showTextDialog(String status)
     {
         AlertDialog.Builder alb=new AlertDialog.Builder(this);
@@ -552,7 +565,6 @@ public class ClientInfo extends AppCompatActivity implements SaveView , PopupMen
             }
         });
     }
-
     private void changeStatus(String status,String comments)
     {
         progressDialog.show();
@@ -560,58 +572,13 @@ public class ClientInfo extends AppCompatActivity implements SaveView , PopupMen
         try {
             js.put("status",status);
             js.put("comments",comments);
+            js.put("saasUserId",id);
         } catch (JSONException e) {
             e.printStackTrace();
         }
+          new SaveImpl(this).handleSave(js,"/request?requestId="+userRequestDetailsId,"PUT","status",token);
 
-        final String requestBody=js.toString();
-        StringRequest stringRequest= new StringRequest(Request.Method.PUT, ApiConstants.BaseUrl + "/request?requestId="+userRequestDetailsId, new com.android.volley.Response.Listener<String>() {
-            @Override
-            public void onResponse(String response)
-            {
-                progressDialog.dismiss();
-                Log.e("ResponseStatus",response);
-                try {
-                    JSONObject js=new JSONObject(response);
-                   String status= js.optString("status");
-                   if (status.equalsIgnoreCase("Success"))
-                   {
-                       finish();
-                   }
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-
-            }
-        }, error -> {
-            ApiConstants.parseVolleyError(ClientInfo.this,error);
-            progressDialog.dismiss();
-            Log.e("Response",""+error);
-        })
-
-
-
-        {
-            @Override
-            public byte[] getBody() {
-                return requestBody.getBytes(StandardCharsets.UTF_8);
-            }
-
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError
-            {
-                HashMap<String,String> hm=new HashMap<>();
-                hm.put("Authorization","Bearer "+token);
-                return hm;
-            }
-            @Override
-            public String getBodyContentType() {
-                return "application/json; charset=utf-8";
-            }
-        };
-        MySingleton.getInstance(this).addToRequestQueue(stringRequest);
     }
-
     private void beginDownload(String url,String name)
     {
        // File file=new File(getExternalFilesDir(null),"Dummy");
@@ -637,13 +604,11 @@ public class ClientInfo extends AppCompatActivity implements SaveView , PopupMen
 
 
     }
-
     @Override
     public void onDestroy() {
         super.onDestroy();
         unregisterReceiver(onDownloadComplete);
     }
-
     public void galleryPermission(String url, String name1)
     {
         Dexter.withActivity(this)
@@ -684,4 +649,5 @@ public class ClientInfo extends AppCompatActivity implements SaveView , PopupMen
 
                 }).check();
     }
+
 }

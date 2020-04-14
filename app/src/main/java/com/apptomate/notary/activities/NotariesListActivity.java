@@ -31,7 +31,7 @@ public class NotariesListActivity extends AppCompatActivity implements SaveView
     String id,agencyId;
     ProgressDialog progressDialog;
     RecyclerView rv_notary;
-    String rId;
+    String rId,assignedTo;
     private String token;
 
     @Override
@@ -43,6 +43,7 @@ public class NotariesListActivity extends AppCompatActivity implements SaveView
         Bundle b= getIntent().getExtras();
         if (b != null) {
             rId= b.getString("rId");
+            assignedTo= b.getString("assignedTo");
         }
         rv_notary=findViewById(R.id.rv_notary);
         rv_notary.setLayoutManager(new LinearLayoutManager(this));
@@ -105,17 +106,21 @@ public class NotariesListActivity extends AppCompatActivity implements SaveView
                 String roleName= json.optString("roleName");
                 String stateName= json.optString("stateName");
                 String countryName= json.optString("countryName");
-                NotaryListModel notaryListModel=new NotaryListModel();
-                notaryListModel.setSaasUserId(saasUserId);
-                notaryListModel.setRoleId(roleId);
-                notaryListModel.setProfileImage(profileImage);
-                notaryListModel.setEmail(email);
-                notaryListModel.setPhoneNumber(phoneNumber);
-                notaryListModel.setName(name);
-                notaryListModel.setRoleName(roleName);
-                notaryListModel.setStateName(stateName);
-                notaryListModel.setCountryName(countryName);
-                arrayList.add(notaryListModel);
+                if (!saasUserId.equalsIgnoreCase(assignedTo))
+                {
+                    NotaryListModel notaryListModel=new NotaryListModel();
+                    notaryListModel.setSaasUserId(saasUserId);
+                    notaryListModel.setRoleId(roleId);
+                    notaryListModel.setProfileImage(profileImage);
+                    notaryListModel.setEmail(email);
+                    notaryListModel.setPhoneNumber(phoneNumber);
+                    notaryListModel.setName(name);
+                    notaryListModel.setRoleName(roleName);
+                    notaryListModel.setStateName(stateName);
+                    notaryListModel.setCountryName(countryName);
+                    arrayList.add(notaryListModel);
+                }
+
 
             }
             NotaryListAdapter notaryListAdapter=new NotaryListAdapter(arrayList,this,rId,id,token);

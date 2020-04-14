@@ -113,6 +113,8 @@ public class InprogressActivity extends AppCompatActivity implements SaveView
         MenuInflater menuInflater = getMenuInflater();
         menuInflater.inflate(R.menu.notification_menu, menu);
         MenuItem searchItem = menu.findItem(R.id.notification_search);
+        MenuItem notification_filter = menu.findItem(R.id.notification_filter);
+        notification_filter.setVisible(false);
         searchView = (SearchView) searchItem.getActionView();
         searchView.setQueryHint("Search...");
         //  searchView.setOnQueryTextListener(this);
@@ -136,13 +138,19 @@ public class InprogressActivity extends AppCompatActivity implements SaveView
     public void onSaveSucess(String code, String response,String type) {
         progressDialog.dismiss();
         Log.e("RequestRes",response);
-        if (code.equalsIgnoreCase("200"))
+        if (response.equalsIgnoreCase("{\"status\":\"Error\",\"message\":\"User is in Inactive\"}"))
         {
-            assignData(response,type);
-        }else if (code.equalsIgnoreCase("401"))
-        {
-            ApiConstants.logOut(this);
+            ApiConstants.showSubscriptionDialog(this);
+        }else {
+            if (code.equalsIgnoreCase("200"))
+            {
+                assignData(response,type);
+            }else if (code.equalsIgnoreCase("401"))
+            {
+                ApiConstants.logOut(this);
+            }
         }
+
     }
 
     private void assignData(String response,String type)
