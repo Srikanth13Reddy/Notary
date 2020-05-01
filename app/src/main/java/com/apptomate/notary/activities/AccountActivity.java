@@ -728,33 +728,38 @@ public class AccountActivity extends AppCompatActivity implements CountryAdapter
     private void assignDatatoFields(String response)
     {
         try {
-            JSONObject jsonObject=new JSONObject(response);
-            JSONObject js=jsonObject.getJSONObject("user");
-            String phoneNumber=js.optString("phoneNumber");
-            String street=js.optString("addressLine1");
-            String apartment=js.optString("addressLine2");
-            String city=js.optString("city");
-            String stateId=js.optString("stateId");
-            String countryId=js.optString("countryId");
-            String postalCode=js.optString("postalCode");
-            String stateName=js.optString("stateName");
-            String countryName=js.optString("countryName");
-            String countryCode=js.optString("countryCode");
-            act_phone.setText(phoneNumber);
-            et_street.setText(street);
-            et_postalcode.setText(postalCode);
-            et_city.setText(city);
-            et_apartment.setText(apartment);
-            tv_country_code.setText(countryId);
-            tv_state_code.setText(stateId);
-            et_country.setText(countryName);
-            et_state.setText(stateName);
-           // act_Cphone.setText("+"+countryCode);
-            if (countryCode.contains("+"))
-            {
-                act_Cphone.setText(countryCode);
-            }else {
-                act_Cphone.setText("+"+countryCode);
+            JSONObject js_=new JSONObject(response);
+            if (js_.optString("status").equalsIgnoreCase("Success")) {
+                JSONObject jsonObject = js_.getJSONObject("data");
+                JSONObject js = jsonObject.getJSONObject("user");
+                String phoneNumber = js.optString("phoneNumber");
+                String street = js.optString("addressLine1");
+                String apartment = js.optString("addressLine2");
+                String city = js.optString("city");
+                String stateId = js.optString("stateId");
+                String countryId = js.optString("countryId");
+                String postalCode = js.optString("postalCode");
+                String stateName = js.optString("stateName");
+                String countryName = js.optString("countryName");
+                String countryCode = js.optString("countryCode");
+                act_phone.setText(phoneNumber);
+                et_street.setText(street);
+                et_postalcode.setText(postalCode);
+                et_city.setText(city);
+                et_apartment.setText(apartment);
+                tv_country_code.setText(countryId);
+                tv_state_code.setText(stateId);
+                et_country.setText(countryName);
+                et_state.setText(stateName);
+                // act_Cphone.setText("+"+countryCode);
+                if (countryCode.contains("+")) {
+                    act_Cphone.setText(countryCode);
+                } else {
+                    act_Cphone.setText("+" + countryCode);
+                }
+            }
+            else {
+                Toast.makeText(this, ""+js_.optString("message"), Toast.LENGTH_SHORT).show();
             }
 
         } catch (JSONException e) {

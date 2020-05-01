@@ -44,7 +44,7 @@ public class LoginActivity extends AppCompatActivity implements SaveView
     AppCompatEditText et_mail,et_pass;
     SharedPrefs sharedPrefs;
     CheckBox log_checkBox;
-    private String refreshedToken;
+    public String refreshedToken;
     boolean doubleBackToExitPressedOnce=false;
 
     @Override
@@ -193,6 +193,7 @@ public class LoginActivity extends AppCompatActivity implements SaveView
                        showtrailDialog();
                     }else {
                         sharedPrefs.LoginSuccess();
+                        sharedPrefs.saveDeviceId(refreshedToken);
                         finish();
                         Intent i=new Intent(LoginActivity.this,HomeActivity.class);
                         startActivity(i);
@@ -253,6 +254,7 @@ public class LoginActivity extends AppCompatActivity implements SaveView
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.dismiss();
+                        sharedPrefs.saveDeviceId(refreshedToken);
                         sharedPrefs.LoginSuccess();
                         finish();
                         Intent i=new Intent(LoginActivity.this,HomeActivity.class);

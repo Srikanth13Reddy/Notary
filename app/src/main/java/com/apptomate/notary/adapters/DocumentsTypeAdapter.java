@@ -67,6 +67,7 @@ public class DocumentsTypeAdapter extends BaseAdapter
         return 0;
     }
 
+    @SuppressLint("SetTextI18n")
     @Override
     public View getView(int position, View convertView, ViewGroup parent)
     {
@@ -91,8 +92,23 @@ public class DocumentsTypeAdapter extends BaseAdapter
         AppCompatTextView fname=v.findViewById(R.id.fname);
         AppCompatTextView sname=v.findViewById(R.id.sname);
         AppCompatTextView service=v.findViewById(R.id.service);
-        fname.setText(""+(position+1)+"."+ arrayList.get(position).getDocumentName());
-        sname.setText(arrayList.get(position).getStateName());
+
+        if (!arrayList.get(position).getShortName().isEmpty())
+        {
+            sname.setText(ApiConstants.toTitleCase(arrayList.get(position).getShortName()));
+        }else {
+            sname.setText(ApiConstants.toTitleCase(arrayList.get(position).getStateName()));
+        }
+
+        String type_id= arrayList.get(position).getDocumentTypeID();
+
+        if (type_id.equalsIgnoreCase("13")||type_id.equalsIgnoreCase("19")||type_id.equalsIgnoreCase("30"))
+        {
+            fname.setText(""+(position+1)+"."+ ApiConstants.toTitleCase(arrayList.get(position).getOtherDocumentName()));
+        }else {
+            fname.setText(""+(position+1)+"."+ ApiConstants.toTitleCase(arrayList.get(position).getDocumentName()));
+        }
+
         service.setText(arrayList.get(position).getServiceName());
 
         aSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {

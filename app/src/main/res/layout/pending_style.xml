@@ -55,6 +55,11 @@
             <androidx.appcompat.widget.AppCompatTextView
                 style="@style/request_notaryname_textview_Style"
                 android:id="@+id/tv_notary_name"
+                android:maxLines="1"
+                android:textAlignment="center"
+                android:layout_width="match_parent"
+                android:layout_marginStart="12sp"
+                android:layout_toEndOf="@+id/tv_time_pending"
                 android:layout_toStartOf="@+id/tv_pending_p"/>
             <androidx.appcompat.widget.AppCompatTextView
                 android:layout_width="wrap_content"

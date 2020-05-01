@@ -39,14 +39,15 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.MyHolder
     Context context;
     ArrayList<RequestModel> arraylist;
     private ArrayList<RequestModel> requestlist;
-    AppCompatTextView tv_notFound;
+    AppCompatTextView tv_notFound,tv_notFound_;
 
-    public RequestAdapter(Context context, ArrayList<RequestModel> requestlist, AppCompatTextView tv_notFound) {
+    public RequestAdapter(Context context, ArrayList<RequestModel> requestlist, AppCompatTextView tv_notFound,AppCompatTextView tv_notFound_) {
         this.context = context;
         this.requestlist = requestlist;
         this.arraylist = new ArrayList<RequestModel>();
         this.arraylist.addAll(requestlist);
         this.tv_notFound=tv_notFound;
+        this.tv_notFound_=tv_notFound_;
     }
 
     @NonNull
@@ -108,8 +109,9 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.MyHolder
                          i.putExtra("rId",obj.getUserRequestDetailsId());
                          i.putExtra("status",obj.getStatus());
                          i.putExtra("notary",obj.getAssignedToName());
-                         context.startActivity(i);
+                        // context.startActivity(i);
                          Activity mContext = (Activity) context;
+                         mContext.startActivityForResult(i, 110);
                          mContext.overridePendingTransition(R.anim.right_in, R.anim.left_out);
                      }else {
                          ApiConstants.showNetworkMessage(context);
@@ -136,9 +138,11 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.MyHolder
         if (requestlist.size()==0)
         {
             tv_notFound.setVisibility(View.VISIBLE);
+            tv_notFound_.setVisibility(View.GONE);
         }
         else {
             tv_notFound.setVisibility(View.GONE);
+            tv_notFound_.setVisibility(View.GONE);
         }
         notifyDataSetChanged();
 

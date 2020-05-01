@@ -110,7 +110,7 @@
 
     <style name="request_notaryname_textview_Style" parent="Widget.AppCompat.DrawerArrowToggle">
         <item name="android:layout_width">wrap_content</item>
-        <item name="android:text">Srikanth Reddy</item>
+        <item name="android:text">Srikanth Reddy Yed</item>
         <item name="android:layout_marginTop">12dp</item>
         <item name="android:textSize">16sp</item>
         <item name="android:layout_marginEnd">12sp</item>

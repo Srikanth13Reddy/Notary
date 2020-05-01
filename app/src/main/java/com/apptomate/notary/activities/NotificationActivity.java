@@ -58,6 +58,7 @@ public class NotificationActivity extends AppCompatActivity implements SaveView
         setContentView(R.layout.activity_notification);
         getSupportActionBar().setTitle("Notifications");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().hide();
         rv_notification=findViewById(R.id.rv_notification);
         tv_noti_notfound=findViewById(R.id.tv_noti_notfound);
        // rv_notification.setLayoutManager(new LinearLayoutManager(this));
@@ -173,7 +174,9 @@ public class NotificationActivity extends AppCompatActivity implements SaveView
     {
         ArrayList<NotificationModel> arrayList=new ArrayList<>();
         try {
-            JSONArray ja=new JSONArray(response);
+            JSONObject jss=new JSONObject(response);
+            if (jss.optString("status").equalsIgnoreCase("Success")){
+            JSONArray ja=jss.getJSONArray("data");
             if (ja.length()==0)
             {
                 tv_noti_notfound.setVisibility(View.VISIBLE);
@@ -202,6 +205,10 @@ public class NotificationActivity extends AppCompatActivity implements SaveView
             }
             NotifictionAdapter notifictionAdapter=new NotifictionAdapter(this,arrayList,token);
             rv_notification.setAdapter(notifictionAdapter);
+            }
+            else {
+                Toast.makeText(this, ""+jss.optString("message"), Toast.LENGTH_SHORT).show();
+            }
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -258,4 +265,27 @@ public class NotificationActivity extends AppCompatActivity implements SaveView
     }
 
 
+    public void readAll(View view)
+    {
+        AlertDialog.Builder alb=new AlertDialog.Builder(this);
+        alb.setTitle("Confirmation");
+        alb.setMessage("Do You Want to Read All ");
+        alb.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                readAll();
+            }
+        });
+        alb.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+        alb.create().show();
+    }
+
+    public void back(View view) {
+        onBackPressed();
+    }
 }

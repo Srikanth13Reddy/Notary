@@ -31,14 +31,15 @@ public class PendingAdapter extends RecyclerView.Adapter<PendingAdapter.MyHolder
     Context context;
     ArrayList<RequestModel> arraylist;
     private ArrayList<RequestModel> requestlist;
-    AppCompatTextView tv_notFound;
+    AppCompatTextView tv_notFound,tv_notFound_;
 
-    public PendingAdapter(Context context, ArrayList<RequestModel> requestlist, AppCompatTextView tv_notFound) {
+    public PendingAdapter(Context context, ArrayList<RequestModel> requestlist, AppCompatTextView tv_notFound,AppCompatTextView tv_notFound_) {
         this.context = context;
         this.requestlist = requestlist;
         this.arraylist = new ArrayList<RequestModel>();
         this.arraylist.addAll(requestlist);
         this.tv_notFound=tv_notFound;
+        this.tv_notFound_=tv_notFound_;
     }
 
     @NonNull
@@ -95,6 +96,7 @@ public class PendingAdapter extends RecyclerView.Adapter<PendingAdapter.MyHolder
         if (requestlist.size()==0)
         {
             tv_notFound.setVisibility(View.VISIBLE);
+            tv_notFound_.setVisibility(View.GONE);
         }
         else {
             tv_notFound.setVisibility(View.GONE);

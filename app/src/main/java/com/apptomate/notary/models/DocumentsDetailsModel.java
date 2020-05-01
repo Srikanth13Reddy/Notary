@@ -7,6 +7,33 @@ public class DocumentsDetailsModel
     String documentName;
     String stateName;
     String status;
+    String shortName;
+    String otherDocumentName;
+    String documentTypeID;
+
+    public String getDocumentTypeID() {
+        return documentTypeID;
+    }
+
+    public void setDocumentTypeID(String documentTypeID) {
+        this.documentTypeID = documentTypeID;
+    }
+
+    public String getOtherDocumentName() {
+        return otherDocumentName;
+    }
+
+    public void setOtherDocumentName(String otherDocumentName) {
+        this.otherDocumentName = otherDocumentName;
+    }
+
+    public String getShortName() {
+        return shortName;
+    }
+
+    public void setShortName(String shortName) {
+        this.shortName = shortName;
+    }
 
     public String getStatus() {
         return status;

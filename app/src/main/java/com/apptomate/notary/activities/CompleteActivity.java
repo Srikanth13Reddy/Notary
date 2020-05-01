@@ -1,13 +1,16 @@
 package com.apptomate.notary.activities;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatTextView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -206,83 +209,66 @@ public class CompleteActivity extends AppCompatActivity implements SaveView
     {
         al.clear();
         try {
-            // JSONObject js=new JSONObject(response);
-            JSONArray ja= new JSONArray(response);
-            for (int i=0;i<ja.length();i++)
-            {
-                JSONObject json= ja.getJSONObject(i);
-                String status_= json.optString("status");
-                if (status_.equalsIgnoreCase("Completed"))
-                {
-                    String userRequestDetailsId= json.optString("userRequestDetailsId");
-                    String requestedDate= json.optString("requestedDate");
-                    String customerId= json.optString("customerId");
-                    String status= json.optString("status");
-                    String assignedTo= json.optString("assignedTo");
-                    String documentsCount= json.optString("documentsCount");
-                    String name= json.optString("name");
-                    String fullAddress= json.optString("fullAddress");
-                    String assignedToName= json.optString("assignedToName");
-                    RequestModel requestModel=new RequestModel();
-                    requestModel.setName(name);
-                    requestModel.setAssignedTo(assignedTo);
-                    requestModel.setUserRequestDetailsId(userRequestDetailsId);
-                    requestModel.setAssignedToName(assignedToName);
-                    requestModel.setCustomerId(customerId);
-                    requestModel.setRequestedDate(requestedDate);
-                    requestModel.setStatus(status);
-                    requestModel.setFullAddress(fullAddress);
-                    requestModel.setDocumentsCount(documentsCount);
-                    al.add(requestModel);
+             JSONObject jss=new JSONObject(response);
+            JSONArray ja=jss.getJSONArray("data");
+            if (jss.optString("status").equalsIgnoreCase("Success")) {
+                for (int i = 0; i < ja.length(); i++) {
+                    JSONObject json = ja.getJSONObject(i);
+                    String status_ = json.optString("status");
+                    if (status_.equalsIgnoreCase("Completed")) {
+                        String userRequestDetailsId = json.optString("userRequestDetailsId");
+                        String requestedDate = json.optString("requestedDate");
+                        String customerId = json.optString("customerId");
+                        String status = json.optString("status");
+                        String assignedTo = json.optString("assignedTo");
+                        String documentsCount = json.optString("documentsCount");
+                        String name = json.optString("name");
+                        String fullAddress = json.optString("fullAddress");
+                        String assignedToName = json.optString("assignedToName");
+                        RequestModel requestModel = new RequestModel();
+                        requestModel.setName(name);
+                        requestModel.setAssignedTo(assignedTo);
+                        requestModel.setUserRequestDetailsId(userRequestDetailsId);
+                        requestModel.setAssignedToName(assignedToName);
+                        requestModel.setCustomerId(customerId);
+                        requestModel.setRequestedDate(requestedDate);
+                        requestModel.setStatus(status);
+                        requestModel.setFullAddress(fullAddress);
+                        requestModel.setDocumentsCount(documentsCount);
+                        al.add(requestModel);
+                    }
+
+
+                }
+                if (al.size() == 0) {
+                    tv_com_notfound.setVisibility(View.VISIBLE);
+                } else {
+                    tv_com_notfound.setVisibility(View.GONE);
                 }
 
+                requestAdapter = new CompleteAdapter(this, al, tv_notFound, tv_com_notfound);
+                rv_complete.setAdapter(requestAdapter);
 
-            }
-            if (al.size()==0)
-            {
-                tv_com_notfound.setVisibility(View.VISIBLE);
+
+                // requestAdapter=  new CompleteAdapter(this,al,tv_notFound);
+                rv_complete.setAdapter(requestAdapter);
+                searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+                    @Override
+                    public boolean onQueryTextSubmit(String s) {
+                        return false;
+                    }
+
+                    @Override
+                    public boolean onQueryTextChange(String s) {
+                        String text = s;
+                        requestAdapter.filter(text);
+                        return false;
+                    }
+                });
             }
             else {
-                tv_com_notfound.setVisibility(View.GONE);
+                Toast.makeText(this, ""+jss.optString("message"), Toast.LENGTH_SHORT).show();
             }
-
-
-            if (type.equalsIgnoreCase(""))
-            {
-                requestAdapter=  new CompleteAdapter(this,al,tv_notFound);
-                rv_complete.setAdapter(requestAdapter);
-            }
-            else if (type.equalsIgnoreCase("name"))
-            {
-                ArrayList<RequestModel> sortedByName = new SortbyStatus(al).getSortedByName();
-                requestAdapter=  new CompleteAdapter(this,sortedByName,tv_notFound);
-                rv_complete.setAdapter(requestAdapter);
-            }
-            else
-            {
-                ArrayList<RequestModel> sortedByName = new SortbyStatus(al).getSortedByStatus();
-                requestAdapter=  new CompleteAdapter(this,sortedByName,tv_notFound);
-                rv_complete.setAdapter(requestAdapter);
-            }
-            
-            
-            // requestAdapter=  new CompleteAdapter(this,al,tv_notFound);
-            rv_complete.setAdapter(requestAdapter);
-            searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener()
-            {
-                @Override
-                public boolean onQueryTextSubmit(String s)
-                {
-                    return false;
-                }
-
-                @Override
-                public boolean onQueryTextChange(String s) {
-                    String text = s;
-                    requestAdapter.filter(text);
-                    return false;
-                }
-            });
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -292,6 +278,20 @@ public class CompleteActivity extends AppCompatActivity implements SaveView
     protected void onRestart()
     {
         super.onRestart();
-        getRequestData( sharedPrefs.getCompleteStatus().get(SharedPrefs.STATUS_DATA_COMPLETE));
+        //getRequestData( sharedPrefs.getCompleteStatus().get(SharedPrefs.STATUS_DATA_COMPLETE));
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 111)
+        {
+           // Toast.makeText(this, "Hiii", Toast.LENGTH_SHORT).show();
+            if(resultCode == Activity.RESULT_OK)
+            {
+                getRequestData("");
+                //Toast.makeText(this, "Hiii", Toast.LENGTH_SHORT).show();
+            }
+        }
     }
 }

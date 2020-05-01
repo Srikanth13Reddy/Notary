@@ -182,45 +182,44 @@ public class RequestActivity extends AppCompatActivity implements SaveView
 
     private void assignData(String response,String type)
     {
+        tv_notFound.setVisibility(View.GONE);
         al.clear();
         try {
-           // JSONObject js=new JSONObject(response);
-           JSONArray ja= new JSONArray(response);
-           if (ja.length()==0)
-           {
-               tv_req_notfound.setVisibility(View.VISIBLE);
-           }
-           else {
-               tv_req_notfound.setVisibility(View.GONE);
-           }
-           for (int i=0;i<ja.length();i++)
-           {
-              JSONObject json= ja.getJSONObject(i);
-               String userRequestDetailsId= json.optString("userRequestDetailsId");
-               String requestedDate= json.optString("requestedDate");
-               String customerId= json.optString("customerId");
-               String status= json.optString("status");
-               String assignedTo= json.optString("assignedTo");
-               String documentsCount= json.optString("documentsCount");
-               String name= json.optString("name");
-               String fullAddress= json.optString("fullAddress");
-               String assignedToName= json.optString("assignedToName");
-               RequestModel requestModel=new RequestModel();
-               requestModel.setName(name);
-               requestModel.setAssignedTo(assignedTo);
-               requestModel.setUserRequestDetailsId(userRequestDetailsId);
-               requestModel.setAssignedToName(assignedToName);
-               requestModel.setCustomerId(customerId);
-               requestModel.setRequestedDate(requestedDate);
-               requestModel.setStatus(status);
-               requestModel.setFullAddress(fullAddress);
-               requestModel.setDocumentsCount(documentsCount);
-               al.add(requestModel);
+            JSONObject jss=new JSONObject(response);
+            if (jss.optString("status").equalsIgnoreCase("Success")) {
+                JSONArray ja =  jss.getJSONArray("data");
+                if (ja.length() == 0) {
+                    tv_req_notfound.setVisibility(View.VISIBLE);
+                } else {
+                    tv_req_notfound.setVisibility(View.GONE);
+                }
+                for (int i = 0; i < ja.length(); i++) {
+                    JSONObject json = ja.getJSONObject(i);
+                    String userRequestDetailsId = json.optString("userRequestDetailsId");
+                    String requestedDate = json.optString("requestedDate");
+                    String customerId = json.optString("customerId");
+                    String status = json.optString("status");
+                    String assignedTo = json.optString("assignedTo");
+                    String documentsCount = json.optString("documentsCount");
+                    String name = json.optString("name");
+                    String fullAddress = json.optString("fullAddress");
+                    String assignedToName = json.optString("assignedToName");
+                    RequestModel requestModel = new RequestModel();
+                    requestModel.setName(name);
+                    requestModel.setAssignedTo(assignedTo);
+                    requestModel.setUserRequestDetailsId(userRequestDetailsId);
+                    requestModel.setAssignedToName(assignedToName);
+                    requestModel.setCustomerId(customerId);
+                    requestModel.setRequestedDate(requestedDate);
+                    requestModel.setStatus(status);
+                    requestModel.setFullAddress(fullAddress);
+                    requestModel.setDocumentsCount(documentsCount);
+                    al.add(requestModel);
 
-           }
+                }
 
-             RequestAdapter  requestAdapter=  new RequestAdapter(this,al,tv_notFound);
-               rv_notification.setAdapter(requestAdapter);
+                RequestAdapter requestAdapter = new RequestAdapter(this, al, tv_notFound, tv_req_notfound);
+                rv_notification.setAdapter(requestAdapter);
 
 //           else if (type.equalsIgnoreCase("name"))
 //           {
@@ -234,22 +233,22 @@ public class RequestActivity extends AppCompatActivity implements SaveView
 //               requestAdapter=  new RequestAdapter(this,sortedByName,tv_notFound);
 //               rv_notification.setAdapter(requestAdapter);
 //           }
-            searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener()
-            {
-                @Override
-                public boolean onQueryTextSubmit(String s)
-                {
-                    return false;
-                }
+                searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+                    @Override
+                    public boolean onQueryTextSubmit(String s) {
+                        return false;
+                    }
 
-                @Override
-                public boolean onQueryTextChange(String s)
-                {
-                    String text = s;
-                    requestAdapter.filter(text);
-                    return false;
-                }
-            });
+                    @Override
+                    public boolean onQueryTextChange(String s) {
+                        String text = s;
+                        requestAdapter.filter(text);
+                        return false;
+                    }
+                });
+            }else {
+                Toast.makeText(this, ""+jss.optString("message"), Toast.LENGTH_SHORT).show();
+            }
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -312,12 +311,12 @@ public class RequestActivity extends AppCompatActivity implements SaveView
         dialog.show();
     }
 
-//    @Override
-//    protected void onRestart()
-//    {
-//        super.onRestart();
-//        getRequestData("");
-//    }
+    @Override
+    protected void onRestart()
+    {
+        super.onRestart();
+       // getRequestData("");
+    }
 
     @SuppressLint("SetTextI18n")
     @Override
@@ -407,10 +406,15 @@ public class RequestActivity extends AppCompatActivity implements SaveView
             if (resultCode == Activity.RESULT_CANCELED) {
                 //Write your code if there's no result
             }
-        }else if (requestCode==10)
+        }
+        else if (requestCode == 110)
         {
-            getRequestData("");
-            //Toast.makeText(this, "Hii", Toast.LENGTH_SHORT).show();
+           // Toast.makeText(this, "Hiii", Toast.LENGTH_SHORT).show();
+            if(resultCode == Activity.RESULT_OK)
+            {
+                getRequestData("");
+                //Toast.makeText(this, "Hiii", Toast.LENGTH_SHORT).show();
+            }
         }
 
 

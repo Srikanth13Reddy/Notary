@@ -93,38 +93,42 @@ public class NotariesListActivity extends AppCompatActivity implements SaveView
     {
         ArrayList<NotaryListModel> arrayList=new ArrayList<>();
         try {
-            JSONArray ja=new JSONArray(response);
-            for (int i=0;i<ja.length();i++)
-            {
-               JSONObject json= ja.getJSONObject(i);
-                String saasUserId= json.optString("saasUserId");
-                String roleId= json.optString("roleId");
-                String profileImage= json.optString("profileImage");
-                String email= json.optString("email");
-                String phoneNumber= json.optString("phoneNumber");
-                String name= json.optString("name");
-                String roleName= json.optString("roleName");
-                String stateName= json.optString("stateName");
-                String countryName= json.optString("countryName");
-                if (!saasUserId.equalsIgnoreCase(assignedTo))
-                {
-                    NotaryListModel notaryListModel=new NotaryListModel();
-                    notaryListModel.setSaasUserId(saasUserId);
-                    notaryListModel.setRoleId(roleId);
-                    notaryListModel.setProfileImage(profileImage);
-                    notaryListModel.setEmail(email);
-                    notaryListModel.setPhoneNumber(phoneNumber);
-                    notaryListModel.setName(name);
-                    notaryListModel.setRoleName(roleName);
-                    notaryListModel.setStateName(stateName);
-                    notaryListModel.setCountryName(countryName);
-                    arrayList.add(notaryListModel);
+            JSONObject js=new JSONObject(response);
+            if (js.optString("status").equalsIgnoreCase("Success")) {
+                JSONArray ja =js.getJSONArray(response);
+                for (int i = 0; i < ja.length(); i++) {
+                    JSONObject json = ja.getJSONObject(i);
+                    String saasUserId = json.optString("saasUserId");
+                    String roleId = json.optString("roleId");
+                    String profileImage = json.optString("profileImage");
+                    String email = json.optString("email");
+                    String phoneNumber = json.optString("phoneNumber");
+                    String name = json.optString("name");
+                    String roleName = json.optString("roleName");
+                    String stateName = json.optString("stateName");
+                    String countryName = json.optString("countryName");
+                    if (!saasUserId.equalsIgnoreCase(assignedTo)) {
+                        NotaryListModel notaryListModel = new NotaryListModel();
+                        notaryListModel.setSaasUserId(saasUserId);
+                        notaryListModel.setRoleId(roleId);
+                        notaryListModel.setProfileImage(profileImage);
+                        notaryListModel.setEmail(email);
+                        notaryListModel.setPhoneNumber(phoneNumber);
+                        notaryListModel.setName(name);
+                        notaryListModel.setRoleName(roleName);
+                        notaryListModel.setStateName(stateName);
+                        notaryListModel.setCountryName(countryName);
+                        arrayList.add(notaryListModel);
+                    }
+
+
                 }
-
-
+                NotaryListAdapter notaryListAdapter = new NotaryListAdapter(arrayList, this, rId, id, token);
+                rv_notary.setAdapter(notaryListAdapter);
             }
-            NotaryListAdapter notaryListAdapter=new NotaryListAdapter(arrayList,this,rId,id,token);
-            rv_notary.setAdapter(notaryListAdapter);
+            else {
+                Toast.makeText(this, ""+js.optString("message"), Toast.LENGTH_SHORT).show();
+            }
         } catch (JSONException e) {
             e.printStackTrace();
         }

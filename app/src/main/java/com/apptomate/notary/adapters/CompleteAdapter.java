@@ -27,19 +27,20 @@ public class CompleteAdapter extends RecyclerView.Adapter<CompleteAdapter.MyHold
     Context context;
     ArrayList<RequestModel> arraylist;
     private ArrayList<RequestModel> requestlist;
-    AppCompatTextView tv_notFound;
+    AppCompatTextView tv_notFound,tv_notFound_;
 
 //    public CompleteAdapter(Context context) {
 //        this.context = context;
 //    }
 
 
-    public CompleteAdapter(Context context, ArrayList<RequestModel> requestlist, AppCompatTextView tv_notFound) {
+    public CompleteAdapter(Context context, ArrayList<RequestModel> requestlist, AppCompatTextView tv_notFound,AppCompatTextView tv_notFound_) {
         this.context = context;
         this.requestlist = requestlist;
         this.arraylist = new ArrayList<RequestModel>();
         this.arraylist.addAll(requestlist);
         this.tv_notFound=tv_notFound;
+        this.tv_notFound_=tv_notFound_;
     }
 
     @NonNull
@@ -73,8 +74,10 @@ public class CompleteAdapter extends RecyclerView.Adapter<CompleteAdapter.MyHold
                     i.putExtra("rId",obj.getUserRequestDetailsId());
                     i.putExtra("status",obj.getStatus());
                     i.putExtra("notary",obj.getAssignedToName());
-                    context.startActivity(i);
+                    //context.startActivity(i);
+                   // Activity mContext = (Activity) context;
                     Activity mContext = (Activity) context;
+                    mContext.startActivityForResult(i, 111);
                     mContext.overridePendingTransition(R.anim.right_in, R.anim.left_out);
                 }else {
                     ApiConstants.showNetworkMessage(context);
@@ -100,9 +103,15 @@ public class CompleteAdapter extends RecyclerView.Adapter<CompleteAdapter.MyHold
         if (requestlist.size()==0)
         {
             tv_notFound.setVisibility(View.VISIBLE);
+            tv_notFound_.setVisibility(View.GONE);
         }
         else {
             tv_notFound.setVisibility(View.GONE);
+            if (arraylist.size()==0)
+            {
+                tv_notFound_.setVisibility(View.VISIBLE);
+            }
+
         }
         notifyDataSetChanged();
     }

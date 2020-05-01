@@ -130,7 +130,7 @@ public class HomeActivity extends AppCompatActivity implements SaveView
     private void getLoginData()
     {
         sharedPrefs=new SharedPrefs(this);
-        Log.e("LoginResponse",sharedPrefs.getLoginData().get(SharedPrefs.LOGIN_DATA));
+        Log.e("LoginResponse",sharedPrefs.getDeviceID().get(SharedPrefs.DEVICE_ID));
         try {
             if (sharedPrefs.getLoginData().get(SharedPrefs.LOGIN_DATA)!=null)
             {
@@ -264,8 +264,10 @@ public class HomeActivity extends AppCompatActivity implements SaveView
         progressDialog.show();
         @SuppressLint("SetTextI18n") StringRequest stringRequest=new StringRequest(Request.Method.GET, ApiConstants.BaseUrl + "requests?saasUserId=" + id, response -> {
             progressDialog.dismiss();
+            Log.e("data_reqcount",response);
             try {
-                JSONArray ja=new JSONArray(response);
+                JSONObject js=new JSONObject(response);
+                JSONArray ja=js.getJSONArray("data");
                int count= ja.length();
                 tv_count.setText(""+count);
             } catch (JSONException e) {
@@ -296,11 +298,16 @@ public class HomeActivity extends AppCompatActivity implements SaveView
         alb.setIcon(R.drawable.ic_exit_to_app_black_24dp);
         alb.setMessage("Do you want Logout from Application");
         alb.setPositiveButton("Yes", (dialog, which) -> {
-            sharedPrefs.logOut();
-            finish();
-            Intent i=new Intent(HomeActivity.this,LoginActivity.class);
-            startActivity(i);
-            overridePendingTransition(R.anim.right_in, R.anim.left_out);
+            progressDialog.show();
+            JSONObject js=new JSONObject();
+            try {
+                js.put("deviceId",sharedPrefs.getDeviceID().get(SharedPrefs.DEVICE_ID));
+                js.put("saasUserId",id);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            new SaveImpl(this).handleSave(js,"auth/saasuserlogout","POST","logout",token);
+
         });
         alb.setNegativeButton("No", (dialog, which) -> dialog.dismiss());
         alb.create().show();
@@ -313,10 +320,31 @@ public class HomeActivity extends AppCompatActivity implements SaveView
 
     @Override
     public void onSaveSucess(String code, String response, String type) {
-        if (code.equalsIgnoreCase("200"))
+
+       progressDialog.dismiss();
+        if (type.equalsIgnoreCase("logout"))
         {
             try {
-                JSONObject jsonObject=new JSONObject(response);
+                JSONObject js=new JSONObject(response);
+                String res= js.optString("status");
+                if (res.equalsIgnoreCase("Success"))
+                {
+                    Toast.makeText(this, ""+js.optString("message"), Toast.LENGTH_SHORT).show();
+                    sharedPrefs.logOut();
+                    finish();
+                    Intent i=new Intent(HomeActivity.this,LoginActivity.class);
+                    startActivity(i);
+                    overridePendingTransition(R.anim.right_in, R.anim.left_out);
+                }else {
+                    Toast.makeText(this, ""+js.optString("message"), Toast.LENGTH_SHORT).show();
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }else {
+            try {
+                JSONObject js_=new JSONObject(response);
+                JSONObject jsonObject=js_.getJSONObject("data");
                 JSONObject js=jsonObject.getJSONObject("user");
                 String profileImage=js.optString("profileImage");
                 if (profileImage.equalsIgnoreCase(""))
@@ -330,6 +358,9 @@ public class HomeActivity extends AppCompatActivity implements SaveView
                 e.printStackTrace();
             }
         }
+
+
+
     }
 
     @Override
@@ -370,13 +401,15 @@ public class HomeActivity extends AppCompatActivity implements SaveView
         progressDialog.show();
         @SuppressLint("SetTextI18n") StringRequest stringRequest=new StringRequest(Request.Method.GET, ApiConstants.BaseUrl +"saasusernotification?saasUserId=" + id, response -> {
             progressDialog.dismiss();
+            Log.e("Notification",response);
             if (response.equalsIgnoreCase("{\"status\":\"Error\",\"message\":\"User is in Inactive\"}"))
             {
                 ApiConstants.showSubscriptionDialog(this);
             }else {
                 ArrayList<Integer> arrayList=new ArrayList<>();
                 try {
-                    JSONArray ja=new JSONArray(response);
+                    JSONObject js=new JSONObject(response);
+                    JSONArray ja= js.getJSONArray("data");
                     for (int i=0;i<ja.length();i++)
                     {
                         JSONObject json= ja.getJSONObject(i);
@@ -449,7 +482,7 @@ public class HomeActivity extends AppCompatActivity implements SaveView
         progressDialog.show();
         @SuppressLint("SetTextI18n") StringRequest stringRequest=new StringRequest(Request.Method.GET, ApiConstants.BaseUrl +"agencynotaries?agencyId="+agencyId, response -> {
             progressDialog.dismiss();
-            Log.e("Res",response);
+            Log.e("ResNotaries",response);
             if (response.equalsIgnoreCase("{\"status\":\"Error\",\"message\":\"User is in Inactive\"}"))
             {
                 ApiConstants.showSubscriptionDialog(this);
@@ -457,7 +490,8 @@ public class HomeActivity extends AppCompatActivity implements SaveView
             {
 
                 try {
-                    JSONArray ja=new JSONArray(response);
+                    JSONObject js=new JSONObject(response);
+                    JSONArray ja=js.getJSONArray("data");
                     tv_notary_count.setText(""+ja.length());
 
                 } catch (JSONException e) {

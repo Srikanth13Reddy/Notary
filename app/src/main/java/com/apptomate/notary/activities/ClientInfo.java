@@ -8,6 +8,7 @@ import androidx.appcompat.widget.AppCompatTextView;
 import androidx.appcompat.widget.PopupMenu;
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DownloadManager;
 import android.app.ProgressDialog;
@@ -35,7 +36,6 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.PopupWindow;
 import android.widget.Toast;
-
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.VolleyError;
@@ -223,10 +223,13 @@ public class ClientInfo extends AppCompatActivity implements SaveView , PopupMen
         }
         return true;
     }
-    @Override
+
     public void onBackPressed()
     {
-        super.onBackPressed();
+        Intent returnIntent = new Intent();
+        returnIntent.putExtra("result","notificationResult");
+        setResult(Activity.RESULT_OK,returnIntent);
+        finish();
         overridePendingTransition(R.anim.left_in, R.anim.right_out);
     }
     @SuppressLint("SetTextI18n")
@@ -247,7 +250,8 @@ public class ClientInfo extends AppCompatActivity implements SaveView , PopupMen
                 String status= js.optString("status");
                 if (status.equalsIgnoreCase("Success"))
                 {
-                    finish();
+                   // finish();
+                    onBackPressed();
                 }else {
                     Toast.makeText(this, ""+js.optString("message"), Toast.LENGTH_SHORT).show();
                 }
@@ -283,108 +287,111 @@ public class ClientInfo extends AppCompatActivity implements SaveView , PopupMen
         verified.clear();
         unverified.clear();
         try {
-            JSONObject js=new JSONObject(response);
-            JSONObject jsonObject= js.getJSONObject("request");
-            String fullAddress= jsonObject.optString("fullAddress");
-            String name= jsonObject.optString("name");
-            userRequestDetailsId= jsonObject.optString("userRequestDetailsId");
-            tv_client_shipping_address.setText(toTitleCase(fullAddress));
-            tv_client_name.setText(toTitleCase(name));
-            String documents= js.optString("documents");
-            String documentdetails= js.optString("documentdetails");
-            JSONArray jaa=new JSONArray(documentdetails);
-            for (int j=0;j<jaa.length();j++)
-            {
-                JSONObject json= jaa.getJSONObject(j);
-                String documentDetailsId= json.optString("documentDetailsId");
-                String serviceName= json.optString("serviceName");
-                String documentName= json.optString("documentName");
-                String stateName= json.optString("stateName");
-                String status= json.optString("status");
-                if (status.equalsIgnoreCase("Unverified"))
-                {
-                    unverified.add(status);
-                }else if (status.equalsIgnoreCase("Verified"))
-                {
-                    verified.add(status);
-                }
-
-                DocumentsDetailsModel detailsModel=new DocumentsDetailsModel();
-                detailsModel.setDocumentDetailsId(documentDetailsId);
-                detailsModel.setServiceName(serviceName);
-                detailsModel.setStateName(stateName);
-                detailsModel.setStatus(status);
-                detailsModel.setDocumentName(documentName);
-                arrayList1.add(detailsModel);
-            }
-            DocumentsTypeAdapter typeAdapter=new DocumentsTypeAdapter(arrayList1,this,token,status);
-            JSONArray ja=new JSONArray(documents);
-            for (int i=0;i<ja.length();i++)
-            {
-                JSONObject json= ja.getJSONObject(i);
-                String fileName= json.optString("fileName");
-                String url= json.optString("url");
-                String fileType= json.optString("fileType");
-                //String status= json.optString("status");
-                // String stateId= json.optString("stateId");
-                // String serviceId= json.optString("serviceId");
-                String userDocumentId= json.optString("requestId");
-                String userRequestDetailsId= json.optString("documentId");
-                DocumentsModel documentsModel=new DocumentsModel();
-                documentsModel.setFileName(fileName);
-                documentsModel.setUrl(url);
-                documentsModel.setStatus(status);
-                documentsModel.setFileType(fileType);
-                //  documentsModel.setStateId(stateId);
-                // documentsModel.setServiceId(serviceId);
-                documentsModel.setUserDocumentId(userDocumentId);
-                documentsModel.setUserRequestDetailsId(userRequestDetailsId);
-                arrayList.add(documentsModel);
-            }
-            DocumentsAdapter documentsAdapter=new DocumentsAdapter(this,arrayList);
-            lv_documents.setAdapter(documentsAdapter);
-            lv_documents1.setAdapter(typeAdapter);
-
-            lv_documents.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> parent, View view, int position, long id)
-                {
-                    String type= arrayList.get(position).getFileType();
-                    String url= arrayList.get(position).getUrl();
-                    String name1= arrayList.get(position).getFileName();
-                    if (type.contains("doc")||type.contains("zip")||type.contains("pdf"))
-                    {
-                        AlertDialog.Builder alb=new AlertDialog.Builder(ClientInfo.this);
-                        alb.setMessage("Do you want to download "+name1);
-                        alb.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which)
-                            {
-                                //beginDownload(url,name1);
-                                galleryPermission(url,name1);
-                            }
-                        });
-                        alb.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                dialog.dismiss();
-                            }
-                        });
-                        alb.create().show();
-                    } else if (type.contains("png")||type.contains("jpg")||type.contains("txt"))
-                    {
-                        startActivity(new Intent(Intent.ACTION_VIEW,Uri.parse(
-                                url)));
+            JSONObject jss=new JSONObject(response);
+            if (jss.optString("status").equalsIgnoreCase("Success")) {
+                JSONObject js = jss.getJSONObject("data");
+                JSONObject jsonObject = js.getJSONObject("request");
+                String fullAddress = jsonObject.optString("fullAddress");
+                String name = jsonObject.optString("name");
+                userRequestDetailsId = jsonObject.optString("userRequestDetailsId");
+                tv_client_shipping_address.setText(toTitleCase(fullAddress));
+                tv_client_name.setText(toTitleCase(name));
+                String documents = js.optString("documents");
+                String documentdetails = js.optString("documentdetails");
+                JSONArray jaa = new JSONArray(documentdetails);
+                for (int j = 0; j < jaa.length(); j++) {
+                    JSONObject json = jaa.getJSONObject(j);
+                    String documentDetailsId = json.optString("documentDetailsId");
+                    String serviceName = json.optString("serviceName");
+                    String documentName = json.optString("documentName");
+                    String stateName = json.optString("stateName");
+                    String status = json.optString("status");
+                    String shortName=json.optString("shortName");
+                    String documentTypeId=json.optString("documentTypeId");
+                    String otherDocumentName=json.optString("otherDocumentName");
+                    if (status.equalsIgnoreCase("Unverified")) {
+                        unverified.add(status);
+                    } else if (status.equalsIgnoreCase("Verified")) {
+                        verified.add(status);
                     }
-                    else {
+
+                    DocumentsDetailsModel detailsModel = new DocumentsDetailsModel();
+                    detailsModel.setDocumentDetailsId(documentDetailsId);
+                    detailsModel.setServiceName(serviceName);
+                    detailsModel.setStateName(stateName);
+                    detailsModel.setShortName(shortName);
+                    detailsModel.setStatus(status);
+                    detailsModel.setOtherDocumentName(otherDocumentName);
+                    detailsModel.setDocumentName(documentName);
+                    detailsModel.setDocumentTypeID(documentTypeId);
+                    arrayList1.add(detailsModel);
+                }
+                DocumentsTypeAdapter typeAdapter = new DocumentsTypeAdapter(arrayList1, this, token, status);
+                JSONArray ja = new JSONArray(documents);
+                for (int i = 0; i < ja.length(); i++) {
+                    JSONObject json = ja.getJSONObject(i);
+                    String fileName = json.optString("fileName");
+                    String url = json.optString("url");
+                    String fileType = json.optString("fileType");
+                    //String status= json.optString("status");
+                    // String stateId= json.optString("stateId");
+                    // String serviceId= json.optString("serviceId");
+                    String userDocumentId = json.optString("requestId");
+                    String userRequestDetailsId = json.optString("documentId");
+                    DocumentsModel documentsModel = new DocumentsModel();
+                    documentsModel.setFileName(fileName);
+                    documentsModel.setUrl(url);
+                    documentsModel.setStatus(status);
+                    documentsModel.setFileType(fileType);
+                    //  documentsModel.setStateId(stateId);
+                    // documentsModel.setServiceId(serviceId);
+                    documentsModel.setUserDocumentId(userDocumentId);
+                    documentsModel.setUserRequestDetailsId(userRequestDetailsId);
+                    arrayList.add(documentsModel);
+                }
+                DocumentsAdapter documentsAdapter = new DocumentsAdapter(this, arrayList);
+                lv_documents.setAdapter(documentsAdapter);
+                lv_documents1.setAdapter(typeAdapter);
+
+                lv_documents.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                        String type = arrayList.get(position).getFileType();
+                        String url = arrayList.get(position).getUrl();
+                        String name1 = arrayList.get(position).getFileName();
+                        if (type.contains("doc") || type.contains("zip") || type.contains("pdf")) {
+                            AlertDialog.Builder alb = new AlertDialog.Builder(ClientInfo.this);
+                            alb.setMessage("Do you want to download " + name1);
+                            alb.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    //beginDownload(url,name1);
+                                    galleryPermission(url, name1);
+                                }
+                            });
+                            alb.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    dialog.dismiss();
+                                }
+                            });
+                            alb.create().show();
+                        } else if (type.contains("png") || type.contains("jpg") || type.contains("txt")) {
+                            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(
+                                    url)));
+                        } else {
 //                            Intent i=new Intent(ClientInfo.this, DocumentViewActivity.class);
 //                           i.putExtra("url",arrayList.get(position).getUrl());
 //                          startActivity(i);
 
-                        startActivity(new Intent(Intent.ACTION_VIEW,Uri.parse(url)));
+                            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
+                        }
                     }
-                }
-            });
+                });
+            }
+            else {
+                Toast.makeText(this, ""+jss.optString("message"), Toast.LENGTH_SHORT).show();
+            }
 
         } catch (JSONException e) {
             e.printStackTrace();

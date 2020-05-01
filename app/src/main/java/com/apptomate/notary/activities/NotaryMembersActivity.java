@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
@@ -119,42 +120,46 @@ public class NotaryMembersActivity extends AppCompatActivity {
     {
         ArrayList<NotaryListModel> arrayList=new ArrayList<>();
         try {
-            JSONArray ja=new JSONArray(response);
-            if (ja.length()==0)
-            {
-                tv_notary_notfound.setVisibility(View.VISIBLE);
-            }else {
-                tv_notary_notfound.setVisibility(View.GONE);
-            }
-            for (int i=0;i<ja.length();i++)
-            {
-                JSONObject json= ja.getJSONObject(i);
-                String saasUserId= json.optString("saasUserId");
-                String roleId= json.optString("roleId");
-                String profileImage= json.optString("profileImage");
-                String email= json.optString("email");
-                String phoneNumber= json.optString("phoneNumber");
-                String name= json.optString("name");
-                String roleName= json.optString("roleName");
-                String stateName= json.optString("stateName");
-                String countryName= json.optString("countryName");
-                String fullAddress= json.optString("fullAddress");
-                NotaryListModel notaryListModel=new NotaryListModel();
-                notaryListModel.setSaasUserId(saasUserId);
-                notaryListModel.setRoleId(roleId);
-                notaryListModel.setProfileImage(profileImage);
-                notaryListModel.setEmail(email);
-                notaryListModel.setPhoneNumber(phoneNumber);
-                notaryListModel.setName(name);
-                notaryListModel.setRoleName(roleName);
-                notaryListModel.setStateName(stateName);
-                notaryListModel.setCountryName(countryName);
-                notaryListModel.setFullAddress(fullAddress);
-                arrayList.add(notaryListModel);
+            JSONObject js=new JSONObject(response);
+            if (js.optString("status").equalsIgnoreCase("Success")) {
+                JSONArray ja = js.getJSONArray("data");
+                if (ja.length() == 0) {
+                    tv_notary_notfound.setVisibility(View.VISIBLE);
+                } else {
+                    tv_notary_notfound.setVisibility(View.GONE);
+                }
+                for (int i = 0; i < ja.length(); i++) {
+                    JSONObject json = ja.getJSONObject(i);
+                    String saasUserId = json.optString("saasUserId");
+                    String roleId = json.optString("roleId");
+                    String profileImage = json.optString("profileImage");
+                    String email = json.optString("email");
+                    String phoneNumber = json.optString("phoneNumber");
+                    String name = json.optString("name");
+                    String roleName = json.optString("roleName");
+                    String stateName = json.optString("stateName");
+                    String countryName = json.optString("countryName");
+                    String fullAddress = json.optString("fullAddress");
+                    NotaryListModel notaryListModel = new NotaryListModel();
+                    notaryListModel.setSaasUserId(saasUserId);
+                    notaryListModel.setRoleId(roleId);
+                    notaryListModel.setProfileImage(profileImage);
+                    notaryListModel.setEmail(email);
+                    notaryListModel.setPhoneNumber(phoneNumber);
+                    notaryListModel.setName(name);
+                    notaryListModel.setRoleName(roleName);
+                    notaryListModel.setStateName(stateName);
+                    notaryListModel.setCountryName(countryName);
+                    notaryListModel.setFullAddress(fullAddress);
+                    arrayList.add(notaryListModel);
 
+                }
+                NotaryMembersAdapter notaryListAdapter = new NotaryMembersAdapter(arrayList, this);
+                rv_ntary.setAdapter(notaryListAdapter);
             }
-            NotaryMembersAdapter notaryListAdapter=new NotaryMembersAdapter(arrayList,this);
-            rv_ntary.setAdapter(notaryListAdapter);
+            else {
+                Toast.makeText(this, ""+js.optString("message"), Toast.LENGTH_SHORT).show();
+            }
         } catch (JSONException e) {
             e.printStackTrace();
         }

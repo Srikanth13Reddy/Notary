@@ -52,18 +52,16 @@ public class OtpVerificationActivity extends AppCompatActivity implements SaveVi
         getSupportActionBar().setTitle("OTP verification");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getLoginData();
-        otpView = findViewById(R.id.otp_view);
-        tv_text= findViewById(R.id.tv_text);
-        btn_verify= findViewById(R.id.btn_verify);
-        tv_text.setText(Html.fromHtml("<![CDATA[\n" +
-                " Enter the OTP sent to <b><font color=\"black\">"+email+"</font></b>\n" +
-                "]]>"));
-        btn_verify.setText("VERIFY & PROCEED");
-        progressDialog=ApiConstants.showProgressDialog(this,"Please wait...");
-       Bundle b= getIntent().getExtras();
+        Bundle b= getIntent().getExtras();
         if (b != null) {
             email= b.getString("email");
         }
+        otpView = findViewById(R.id.otp_view);
+        tv_text= findViewById(R.id.tv_text);
+        btn_verify= findViewById(R.id.btn_verify);
+        tv_text.setText(Html.fromHtml("Enter the OTP sent to <b><font color=\"black\">"+email+"</font></b>"));
+        btn_verify.setText("VERIFY & PROCEED");
+        progressDialog=ApiConstants.showProgressDialog(this,"Please wait...");
         otpView.setOtpCompletionListener(new OnOtpCompletionListener() {
             @Override
             public void onOtpCompleted(String otp) {

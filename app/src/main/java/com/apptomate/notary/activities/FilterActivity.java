@@ -366,7 +366,8 @@ public class FilterActivity extends AppCompatActivity implements SaveView
     }
 
     @Override
-    public void onBackPressed() {
+    public void onBackPressed()
+    {
         super.onBackPressed();
         Intent returnIntent = new Intent(this,HomeActivity.class);
         returnIntent.putExtra("result","");

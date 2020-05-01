@@ -158,77 +158,63 @@ public class PendingActivity extends AppCompatActivity implements SaveView
     {
         al.clear();
         try {
-            // JSONObject js=new JSONObject(response);
-            JSONArray ja= new JSONArray(response);
-            for (int i=0;i<ja.length();i++)
-            {
-                JSONObject json= ja.getJSONObject(i);
-                String status_= json.optString("status");
-                if (status_.equalsIgnoreCase("Pending"))
-                {
-                    String userRequestDetailsId= json.optString("userRequestDetailsId");
-                    String requestedDate= json.optString("requestedDate");
-                    String customerId= json.optString("customerId");
-                    String status= json.optString("status");
-                    String assignedTo= json.optString("assignedTo");
-                    String documentsCount= json.optString("documentsCount");
-                    String name= json.optString("name");
-                    String fullAddress= json.optString("fullAddress");
-                    String assignedToName= json.optString("assignedToName");
-                    RequestModel requestModel=new RequestModel();
-                    requestModel.setName(name);
-                    requestModel.setAssignedTo(assignedTo);
-                    requestModel.setUserRequestDetailsId(userRequestDetailsId);
-                    requestModel.setAssignedToName(assignedToName);
-                    requestModel.setCustomerId(customerId);
-                    requestModel.setRequestedDate(requestedDate);
-                    requestModel.setStatus(status);
-                    requestModel.setFullAddress(fullAddress);
-                    requestModel.setDocumentsCount(documentsCount);
-                    al.add(requestModel);
-                }
+             JSONObject jss=new JSONObject(response);
+             if (jss.optString("status").equalsIgnoreCase("Success")) {
+                 JSONArray ja = jss.getJSONArray("data");
+                 for (int i = 0; i < ja.length(); i++) {
+                     JSONObject json = ja.getJSONObject(i);
+                     String status_ = json.optString("status");
+                     if (status_.equalsIgnoreCase("Pending")) {
+                         String userRequestDetailsId = json.optString("userRequestDetailsId");
+                         String requestedDate = json.optString("requestedDate");
+                         String customerId = json.optString("customerId");
+                         String status = json.optString("status");
+                         String assignedTo = json.optString("assignedTo");
+                         String documentsCount = json.optString("documentsCount");
+                         String name = json.optString("name");
+                         String fullAddress = json.optString("fullAddress");
+                         String assignedToName = json.optString("assignedToName");
+                         RequestModel requestModel = new RequestModel();
+                         requestModel.setName(name);
+                         requestModel.setAssignedTo(assignedTo);
+                         requestModel.setUserRequestDetailsId(userRequestDetailsId);
+                         requestModel.setAssignedToName(assignedToName);
+                         requestModel.setCustomerId(customerId);
+                         requestModel.setRequestedDate(requestedDate);
+                         requestModel.setStatus(status);
+                         requestModel.setFullAddress(fullAddress);
+                         requestModel.setDocumentsCount(documentsCount);
+                         al.add(requestModel);
+                     }
 
 
-            }
-            if (al.size()==0)
-            {
-                tv_pen_notfound.setVisibility(View.VISIBLE);
-            }
-            else {
-                tv_pen_notfound.setVisibility(View.GONE);
-            }
-            if (type.equalsIgnoreCase(""))
-            {
-                requestAdapter=  new PendingAdapter(this,al,tv_notFound);
-                rv_pending.setAdapter(requestAdapter);
-            }
-            else if (type.equalsIgnoreCase("name"))
-            {
-                ArrayList<RequestModel> sortedByName = new SortbyStatus(al).getSortedByName();
-                requestAdapter=  new PendingAdapter(this,sortedByName,tv_notFound);
-                rv_pending.setAdapter(requestAdapter);
-            }
-            else
-            {
-                ArrayList<RequestModel> sortedByName = new SortbyStatus(al).getSortedByStatus();
-                requestAdapter=  new PendingAdapter(this,sortedByName,tv_notFound);
-                rv_pending.setAdapter(requestAdapter);
-            }
-            searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener()
-            {
-                @Override
-                public boolean onQueryTextSubmit(String s)
-                {
-                    return false;
-                }
+                 }
+                 if (al.size() == 0) {
+                     tv_pen_notfound.setVisibility(View.VISIBLE);
+                 } else {
+                     tv_pen_notfound.setVisibility(View.GONE);
+                 }
 
-                @Override
-                public boolean onQueryTextChange(String s) {
-                    String text = s;
-                    requestAdapter.filter(text);
-                    return false;
-                }
-            });
+                 requestAdapter = new PendingAdapter(this, al, tv_notFound, tv_pen_notfound);
+                 rv_pending.setAdapter(requestAdapter);
+
+                 searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+                     @Override
+                     public boolean onQueryTextSubmit(String s) {
+                         return false;
+                     }
+
+                     @Override
+                     public boolean onQueryTextChange(String s) {
+                         String text = s;
+                         requestAdapter.filter(text);
+                         return false;
+                     }
+                 });
+             }
+             else {
+                 Toast.makeText(this, ""+jss.optString("message"), Toast.LENGTH_SHORT).show();
+             }
         } catch (JSONException e) {
             e.printStackTrace();
         }

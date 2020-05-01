@@ -32,14 +32,15 @@ public class InprogressAdapter extends RecyclerView.Adapter<InprogressAdapter.My
     Context context;
     ArrayList<RequestModel> arraylist;
     private ArrayList<RequestModel> requestlist;
-    AppCompatTextView tv_notFound;
+    AppCompatTextView tv_notFound,tv_notFound_;
 
-    public InprogressAdapter(Context context, ArrayList<RequestModel> requestlist, AppCompatTextView tv_notFound) {
+    public InprogressAdapter(Context context, ArrayList<RequestModel> requestlist, AppCompatTextView tv_notFound,AppCompatTextView tv_notFound_) {
         this.context = context;
         this.requestlist = requestlist;
         this.arraylist = new ArrayList<RequestModel>();
         this.arraylist.addAll(requestlist);
         this.tv_notFound=tv_notFound;
+        this.tv_notFound_=tv_notFound_;
     }
 
     @NonNull
@@ -96,6 +97,7 @@ public class InprogressAdapter extends RecyclerView.Adapter<InprogressAdapter.My
         if (requestlist.size()==0)
         {
             tv_notFound.setVisibility(View.VISIBLE);
+            tv_notFound_.setVisibility(View.GONE);
         }
         else {
             tv_notFound.setVisibility(View.GONE);

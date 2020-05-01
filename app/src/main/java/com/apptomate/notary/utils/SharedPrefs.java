@@ -23,6 +23,7 @@ public class SharedPrefs
     public static final String STATUS_DATA_COMPLETE="STATUS_DATA_COMPLETE";
     public static final String STATUS_DATA_PENDING="STATUS_DATA_PENDING";
     public static final String STATUS_DATA_PROCESS="STATUS_DATA_PROCESS";
+    public static final String DEVICE_ID="DEVICE_ID";
     // Shared Preferences
     SharedPreferences pref;
     // Editor for Shared preferences
@@ -111,6 +112,22 @@ public class SharedPrefs
         // user name
 
         user.put(STATUS_DATA, pref.getString(STATUS_DATA, ""));
+
+        return user;
+    }
+
+    public void saveDeviceId(String res)
+    {
+        editor.putString(DEVICE_ID, String.valueOf(res));
+        editor.commit();
+    }
+
+    public HashMap<String, String> getDeviceID()
+    {
+        HashMap<String, String> user = new HashMap<String, String>();
+        // user name
+
+        user.put(DEVICE_ID, pref.getString(DEVICE_ID, ""));
 
         return user;
     }
