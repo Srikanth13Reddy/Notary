@@ -13,6 +13,15 @@ public class RequestModel
     private String name;
     private String fullAddress;
     private String assignedToName;
+    private String requestCode;
+
+    public String getRequestCode() {
+        return requestCode;
+    }
+
+    public void setRequestCode(String requestCode) {
+        this.requestCode = requestCode;
+    }
 
     public String getUserRequestDetailsId() {
         return userRequestDetailsId;

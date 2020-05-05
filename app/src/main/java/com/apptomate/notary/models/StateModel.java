@@ -4,8 +4,17 @@ public class StateModel
 {
     String stateId;
     String stateName;
+    String shortName;
     String countryId;
     private boolean isSelected;
+
+    public String getShortName() {
+        return shortName;
+    }
+
+    public void setShortName(String shortName) {
+        this.shortName = shortName;
+    }
 
     public boolean getSelected() {
         return isSelected;

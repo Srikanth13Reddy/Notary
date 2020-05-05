@@ -280,6 +280,7 @@ public class ClientInfo extends AppCompatActivity implements SaveView , PopupMen
 
     }
 
+    @SuppressLint("SetTextI18n")
     private void assignData(String response)
     {
         ArrayList<DocumentsModel> arrayList=new ArrayList<>();
@@ -293,9 +294,10 @@ public class ClientInfo extends AppCompatActivity implements SaveView , PopupMen
                 JSONObject jsonObject = js.getJSONObject("request");
                 String fullAddress = jsonObject.optString("fullAddress");
                 String name = jsonObject.optString("name");
+                String requestCode = jsonObject.optString("requestCode");
                 userRequestDetailsId = jsonObject.optString("userRequestDetailsId");
                 tv_client_shipping_address.setText(toTitleCase(fullAddress));
-                tv_client_name.setText(toTitleCase(name));
+                tv_client_name.setText(requestCode+" - "+toTitleCase(name));
                 String documents = js.optString("documents");
                 String documentdetails = js.optString("documentdetails");
                 JSONArray jaa = new JSONArray(documentdetails);

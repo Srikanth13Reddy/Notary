@@ -61,7 +61,7 @@ public class PendingAdapter extends RecyclerView.Adapter<PendingAdapter.MyHolder
             holder.tv_time_pending.setText(time(obj.getRequestedDate()));
             holder.tv_documents_pending.setText("Documents - "+obj.getDocumentsCount());
             holder.tv_address_pending.setText(obj.getFullAddress());
-            holder.name_tv_pending.setText(toTitleCase(obj.getName()));
+            holder.name_tv_pending.setText(obj.getRequestCode()+" - "+toTitleCase(obj.getName()));
            // holder.tv_notary_name.setText(obj.getAssignedToName());
             holder.tv_notary_name.setText(toTitleCase(obj.getAssignedToName()));
             holder.itemView.setOnClickListener(v -> {
@@ -70,7 +70,7 @@ public class PendingAdapter extends RecyclerView.Adapter<PendingAdapter.MyHolder
                     Intent i=new Intent(context, ClientInfo.class);
                     i.putExtra("rId",obj.getUserRequestDetailsId());
                     i.putExtra("status",obj.getStatus());
-                    i.putExtra("notary",obj.getAssignedToName());
+                    i.putExtra("notaryId",obj.getAssignedTo());
                     context.startActivity(i);
                     Activity mContext = (Activity) context;
                     mContext.overridePendingTransition(R.anim.right_in, R.anim.left_out);

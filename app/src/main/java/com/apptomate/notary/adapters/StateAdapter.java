@@ -56,16 +56,18 @@ public class StateAdapter extends RecyclerView.Adapter<StateAdapter.MyHolder>
 
     @Override
     public void onBindViewHolder(@NonNull MyHolder holder, int position) {
-        if (statelist.get(position).getStateName()!=null)
+        if (statelist.get(position).getStateName()!=null&&statelist.get(position).getShortName().isEmpty())
         {
             holder.tv_country.setText(statelist.get(position).getStateName());
+        }else {
+            holder.tv_country.setText(statelist.get(position).getShortName());
         }
         holder.itemView.setOnClickListener(new View.OnClickListener()
         {
             @Override
             public void onClick(View v) {
                 alertDialog.cancel();
-                eventListener.onEventState(statelist.get(position).getStateId(),statelist.get(position).getStateName());
+                eventListener.onEventState(statelist.get(position).getStateId(),statelist.get(position).getShortName().isEmpty() ? statelist.get(position).getStateName() :statelist.get(position).getShortName());
                 //Toast.makeText(context, ""+statelist.get(position).getName(), Toast.LENGTH_SHORT).show();
             }
         });

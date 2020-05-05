@@ -203,9 +203,11 @@ public class RequestActivity extends AppCompatActivity implements SaveView
                     String documentsCount = json.optString("documentsCount");
                     String name = json.optString("name");
                     String fullAddress = json.optString("fullAddress");
+                    String requestCode = json.optString("requestCode");
                     String assignedToName = json.optString("assignedToName");
                     RequestModel requestModel = new RequestModel();
                     requestModel.setName(name);
+                    requestModel.setRequestCode(requestCode);
                     requestModel.setAssignedTo(assignedTo);
                     requestModel.setUserRequestDetailsId(userRequestDetailsId);
                     requestModel.setAssignedToName(assignedToName);

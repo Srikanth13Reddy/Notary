@@ -63,7 +63,7 @@ public class CompleteAdapter extends RecyclerView.Adapter<CompleteAdapter.MyHold
             holder.tv_time_rqst.setText(time(obj.getRequestedDate()));
             holder.tv_documents_com.setText("Documents - "+obj.getDocumentsCount());
             holder.tv_address_com.setText(obj.getFullAddress());
-            holder.name_tv_com.setText(toTitleCase(obj.getName()));
+            holder.name_tv_com.setText(obj.getRequestCode()+" - "+toTitleCase(obj.getName()));
            // holder.tv_notary_name.setText(obj.getAssignedToName());
             holder.tv_notary_name.setText(toTitleCase(obj.getAssignedToName()));
             holder.itemView.setOnClickListener(v ->
@@ -73,7 +73,7 @@ public class CompleteAdapter extends RecyclerView.Adapter<CompleteAdapter.MyHold
                     Intent i=new Intent(context, ClientInfo.class);
                     i.putExtra("rId",obj.getUserRequestDetailsId());
                     i.putExtra("status",obj.getStatus());
-                    i.putExtra("notary",obj.getAssignedToName());
+                    i.putExtra("notaryId",obj.getAssignedTo());
                     //context.startActivity(i);
                    // Activity mContext = (Activity) context;
                     Activity mContext = (Activity) context;

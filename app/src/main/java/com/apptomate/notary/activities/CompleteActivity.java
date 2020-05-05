@@ -223,10 +223,12 @@ public class CompleteActivity extends AppCompatActivity implements SaveView
                         String assignedTo = json.optString("assignedTo");
                         String documentsCount = json.optString("documentsCount");
                         String name = json.optString("name");
+                        String requestCode = json.optString("requestCode");
                         String fullAddress = json.optString("fullAddress");
                         String assignedToName = json.optString("assignedToName");
                         RequestModel requestModel = new RequestModel();
                         requestModel.setName(name);
+                        requestModel.setRequestCode(requestCode);
                         requestModel.setAssignedTo(assignedTo);
                         requestModel.setUserRequestDetailsId(userRequestDetailsId);
                         requestModel.setAssignedToName(assignedToName);

@@ -71,7 +71,7 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.MyHolder
              holder.tv_time_rqst.setText(time(obj.getRequestedDate()));
              holder.tv_documents_rqst.setText("Documents - "+obj.getDocumentsCount());
              holder.tv_address_rqst.setText(obj.getFullAddress());
-             holder.name_tv_rqst.setText(toTitleCase(obj.getName()));
+             holder.name_tv_rqst.setText(obj.getRequestCode()+" - "+toTitleCase(obj.getName()));
              holder.tv_notary_name.setText(toTitleCase(obj.getAssignedToName()));
              if (obj.getStatus().equalsIgnoreCase("New"))
              {
@@ -108,7 +108,7 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.MyHolder
                          Intent i=new Intent(context, ClientInfo.class);
                          i.putExtra("rId",obj.getUserRequestDetailsId());
                          i.putExtra("status",obj.getStatus());
-                         i.putExtra("notary",obj.getAssignedToName());
+                         i.putExtra("notaryId",obj.getAssignedTo());
                         // context.startActivity(i);
                          Activity mContext = (Activity) context;
                          mContext.startActivityForResult(i, 110);

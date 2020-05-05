@@ -153,13 +153,10 @@ public class ProfileActivity extends AppCompatActivity implements SaveView
                 String roleName = js.optString("roleName");
                 String fullAddress = js.optString("fullAddress");
                 String countryCode = js.optString("countryCode");
-                if (profileImage != null) {
-                    if (profileImage.equalsIgnoreCase("")) {
-                        iv.setImageResource(R.drawable.profile_d);
-                    } else {
-                        Picasso.get().load(profileImage).placeholder(R.drawable.profile_d).into(iv);
-                    }
-
+                if (profileImage.equalsIgnoreCase("")) {
+                    iv.setImageResource(R.drawable.profile_d);
+                } else {
+                    Picasso.get().load(profileImage).placeholder(R.drawable.profile_d).into(iv);
                 }
 
                 tv_total.setText("" + totalRequest);

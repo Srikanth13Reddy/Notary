@@ -25,6 +25,7 @@ import com.apptomate.notary.activities.NotariesListActivity;
 import com.apptomate.notary.models.NotaryListModel;
 import com.apptomate.notary.utils.ApiConstants;
 import com.apptomate.notary.utils.MySingleton;
+import com.apptomate.notary.utils.SaveImpl;
 import com.squareup.picasso.Picasso;
 
 import org.json.JSONException;
@@ -44,13 +45,15 @@ public class NotaryListAdapter extends RecyclerView.Adapter<NotaryListAdapter.My
     String rId;
     String id;
     private String token;
+    ProgressDialog progressDialog;
 
-    public NotaryListAdapter(ArrayList<NotaryListModel> arrayList, Context context, String rId, String id,String token) {
+    public NotaryListAdapter(ArrayList<NotaryListModel> arrayList, Context context, String rId, String id,String token,ProgressDialog progressDialog) {
         this.arrayList = arrayList;
         this.context = context;
         this.rId=rId;
         this.id=id;
         this.token=token;
+        this.progressDialog=progressDialog;
     }
 
     @NonNull
@@ -122,7 +125,6 @@ public class NotaryListAdapter extends RecyclerView.Adapter<NotaryListAdapter.My
 
     private void assignData(String id)
     {
-        ProgressDialog progressDialog= ApiConstants.showProgressDialog(context,"Please wait....");
         progressDialog.show();
         JSONObject js=new JSONObject();
         try {
@@ -133,51 +135,7 @@ public class NotaryListAdapter extends RecyclerView.Adapter<NotaryListAdapter.My
             e.printStackTrace();
         }
 
-        final String requestBody=js.toString();
-        RequestQueue requestQueue= Volley.newRequestQueue(context);
-        StringRequest stringRequest= new StringRequest(Request.Method.PATCH, ApiConstants.BaseUrl + "/request?requestId="+rId,
-                response -> {
-            progressDialog.dismiss();
-            Log.e("ResponseStatus",response);
-            try {
-                JSONObject js1 =new JSONObject(response);
-                String status= js1.optString("status");
-                if (status.equalsIgnoreCase("Success"))
-                {
-                    Toast.makeText(context, ""+js1.optString("message"), Toast.LENGTH_SHORT).show();
-                   NotariesListActivity activity= (NotariesListActivity)context;
-                   activity.finish();
-                }
-                else {
-                    Toast.makeText(context, ""+js1.optString("message"), Toast.LENGTH_SHORT).show();
-                }
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
+        new SaveImpl((NotariesListActivity)context).handleSave(js,"/request?requestId="+rId,"PUT","Assign",token);
 
-        }, error -> {
-            progressDialog.dismiss();
-            ApiConstants.parseVolleyError(context,error);
-            Log.e("Response",""+error);
-        })
-
-        {
-            @Override
-            public byte[] getBody() {
-                return requestBody.getBytes(StandardCharsets.UTF_8);
-            }
-            @Override
-            public String getBodyContentType() {
-                return "application/json; charset=utf-8";
-            }
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError
-            {
-                HashMap<String,String> hm=new HashMap<>();
-                hm.put("Authorization","Bearer "+token);
-                return hm;
-            }
-        };
-        MySingleton.getInstance(context).addToRequestQueue(stringRequest);
     }
 }

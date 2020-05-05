@@ -2,6 +2,7 @@ package com.apptomate.notary.activities;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.AppCompatTextView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -9,6 +10,7 @@ import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
 
 import com.apptomate.notary.R;
@@ -33,6 +35,7 @@ public class NotariesListActivity extends AppCompatActivity implements SaveView
     RecyclerView rv_notary;
     String rId,assignedTo;
     private String token;
+    AppCompatTextView tv_not_found;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,6 +49,7 @@ public class NotariesListActivity extends AppCompatActivity implements SaveView
             assignedTo= b.getString("assignedTo");
         }
         rv_notary=findViewById(R.id.rv_notary);
+        tv_not_found=findViewById(R.id.tv_not_found);
         rv_notary.setLayoutManager(new LinearLayoutManager(this));
         progressDialog= ApiConstants.showProgressDialog(this,"Please wait....");
         getLoginData();
@@ -79,14 +83,34 @@ public class NotariesListActivity extends AppCompatActivity implements SaveView
     public void onSaveSucess(String code, String response, String type)
     {
        progressDialog.dismiss();
-        Log.e("Noaries",response);
-        if (code.equalsIgnoreCase("200"))
-        {
-            assignData(response);
-        }else if (code.equalsIgnoreCase("401"))
-        {
-            ApiConstants.logOut(this);
-        }
+       if (type.equalsIgnoreCase("Assign"))
+       {
+           Log.e("ResponseStatus",response);
+           try {
+               JSONObject js1 =new JSONObject(response);
+               String status= js1.optString("status");
+               if (status.equalsIgnoreCase("Success"))
+               {
+                   Toast.makeText(this, ""+js1.optString("message"), Toast.LENGTH_SHORT).show();
+                   finish();
+               }
+               else {
+                   Toast.makeText(this, ""+js1.optString("message"), Toast.LENGTH_SHORT).show();
+               }
+           } catch (JSONException e) {
+               e.printStackTrace();
+           }
+       }else {
+           Log.e("Noaries",response);
+           if (code.equalsIgnoreCase("200"))
+           {
+               assignData(response);
+           }else if (code.equalsIgnoreCase("401"))
+           {
+               ApiConstants.logOut(this);
+           }
+       }
+
     }
 
     private void assignData(String response)
@@ -94,8 +118,9 @@ public class NotariesListActivity extends AppCompatActivity implements SaveView
         ArrayList<NotaryListModel> arrayList=new ArrayList<>();
         try {
             JSONObject js=new JSONObject(response);
-            if (js.optString("status").equalsIgnoreCase("Success")) {
-                JSONArray ja =js.getJSONArray(response);
+            if (js.optString("status").equalsIgnoreCase("Success"))
+            {
+                JSONArray ja =js.getJSONArray("data");
                 for (int i = 0; i < ja.length(); i++) {
                     JSONObject json = ja.getJSONObject(i);
                     String saasUserId = json.optString("saasUserId");
@@ -107,7 +132,8 @@ public class NotariesListActivity extends AppCompatActivity implements SaveView
                     String roleName = json.optString("roleName");
                     String stateName = json.optString("stateName");
                     String countryName = json.optString("countryName");
-                    if (!saasUserId.equalsIgnoreCase(assignedTo)) {
+                    if (!saasUserId.equalsIgnoreCase(assignedTo))
+                    {
                         NotaryListModel notaryListModel = new NotaryListModel();
                         notaryListModel.setSaasUserId(saasUserId);
                         notaryListModel.setRoleId(roleId);
@@ -123,7 +149,13 @@ public class NotariesListActivity extends AppCompatActivity implements SaveView
 
 
                 }
-                NotaryListAdapter notaryListAdapter = new NotaryListAdapter(arrayList, this, rId, id, token);
+                if (arrayList.size()==0)
+                {
+                    tv_not_found.setVisibility(View.VISIBLE);
+                }else {
+                    tv_not_found.setVisibility(View.GONE);
+                }
+                NotaryListAdapter notaryListAdapter = new NotaryListAdapter(arrayList, this, rId, id, token,progressDialog);
                 rv_notary.setAdapter(notaryListAdapter);
             }
             else {

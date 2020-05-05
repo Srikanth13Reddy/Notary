@@ -343,37 +343,45 @@ public class AccountActivity extends AppCompatActivity implements CountryAdapter
             @Override
             public void onResponse(String response)
             {
+                Log.e("Response_States",response);
                 ad.show();
                 progressDialog.dismiss();
                 try {
-                    JSONArray ja=new JSONArray(response);
-                    for (int i=0;i<ja.length();i++)
-                    {
-                        JSONObject json= ja.getJSONObject(i);
-                        String stateId= json.optString("stateId");
-                        String stateName= json.optString("stateName");
-                        String countryId= json.optString("countryId");
-                        StateModel countryModel=new StateModel();
-                        countryModel.setStateId(stateId);
-                        countryModel.setCountryId(countryId);
-                        countryModel.setStateName(stateName);
-                        arrayList.add(countryModel);
+                    JSONObject js=new JSONObject(response);
+                    String status=js.optString("status");
+                    if (status.equalsIgnoreCase("Success")) {
+                        JSONArray ja = js.getJSONArray("data");
+                        for (int i = 0; i < ja.length(); i++) {
+                            JSONObject json = ja.getJSONObject(i);
+                            String stateId = json.optString("stateId");
+                            String stateName = json.optString("stateName");
+                            String shortName=json.optString("shortName");
+                            String countryId = json.optString("countryId");
+                            StateModel countryModel = new StateModel();
+                            countryModel.setStateId(stateId);
+                            countryModel.setShortName(shortName);
+                            countryModel.setCountryId(countryId);
+                            countryModel.setStateName(stateName);
+                            arrayList.add(countryModel);
+                        }
+                        StateAdapter countryAdapter = new StateAdapter(arrayList, AccountActivity.this, tv_notFound, AccountActivity.this, ad);
+                        rv_search.setAdapter(countryAdapter);
+
+                        country_search.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+                            @Override
+                            public boolean onQueryTextSubmit(String query) {
+                                return false;
+                            }
+
+                            @Override
+                            public boolean onQueryTextChange(String newText) {
+                                countryAdapter.filter(newText);
+                                return false;
+                            }
+                        });
+                    }else {
+                        Toast.makeText(AccountActivity.this, ""+js.optString("message"), Toast.LENGTH_SHORT).show();
                     }
-                    StateAdapter countryAdapter=new StateAdapter(arrayList,AccountActivity.this,tv_notFound,AccountActivity.this,ad);
-                    rv_search.setAdapter(countryAdapter);
-
-                    country_search.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-                        @Override
-                        public boolean onQueryTextSubmit(String query) {
-                            return false;
-                        }
-
-                        @Override
-                        public boolean onQueryTextChange(String newText) {
-                            countryAdapter.filter(newText);
-                            return false;
-                        }
-                    });
 
 
 
@@ -503,41 +511,50 @@ public class AccountActivity extends AppCompatActivity implements CountryAdapter
             @Override
             public void onResponse(String response)
             {
+                Log.e("Response_countries",response);
                 ad.show();
                 progressDialog.dismiss();
                 try {
-                    JSONArray ja=new JSONArray(response);
-                    for (int i=0;i<ja.length();i++)
-                    {
-                       JSONObject json= ja.getJSONObject(i);
-                        String countryId= json.optString("countryId");
-                        String sortName= json.optString("sortName");
-                        String name= json.optString("name");
-                        String code= json.optString("code");
-                        CountryModel countryModel=new CountryModel();
-                        countryModel.setCode(code);
-                        countryModel.setCountryId(countryId);
-                        countryModel.setSortName(sortName);
-                        countryModel.setName(name);
-                        arrayList.add(countryModel);
-                    }
-                    CountryAdapter countryAdapter=new CountryAdapter(arrayList,AccountActivity.this,tv_notFound,AccountActivity.this,ad);
-                    rv_search.setAdapter(countryAdapter);
+                    JSONObject js=new JSONObject(response);
+                  String status=js.optString("status");
+                  if (status.equalsIgnoreCase("Success"))
+                  {
+                      JSONArray ja=js.getJSONArray("data");
+                      for (int i=0;i<ja.length();i++)
+                      {
+                          JSONObject json= ja.getJSONObject(i);
+                          String countryId= json.optString("countryId");
+                          String sortName= json.optString("sortName");
+                          String name= json.optString("name");
+                          String code= json.optString("code");
+                          CountryModel countryModel=new CountryModel();
+                          countryModel.setCode(code);
+                          countryModel.setCountryId(countryId);
+                          countryModel.setSortName(sortName);
+                          countryModel.setName(name);
+                          arrayList.add(countryModel);
+                      }
+                      CountryAdapter countryAdapter=new CountryAdapter(arrayList,AccountActivity.this,tv_notFound,AccountActivity.this,ad);
+                      rv_search.setAdapter(countryAdapter);
 
-                    country_search.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-                        @Override
-                        public boolean onQueryTextSubmit(String query) {
-                            return false;
-                        }
+                      country_search.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+                          @Override
+                          public boolean onQueryTextSubmit(String query) {
+                              return false;
+                          }
 
-                        @Override
-                        public boolean onQueryTextChange(String newText) {
-                            String text = newText;
-                            countryAdapter.filter(text);
-                            return false;
-                        }
-                    });
+                          @Override
+                          public boolean onQueryTextChange(String newText) {
+                              String text = newText;
+                              countryAdapter.filter(text);
+                              return false;
+                          }
+                      });
 
+
+                  }else {
+                      Toast.makeText(AccountActivity.this, ""+js.optString("message"), Toast.LENGTH_SHORT).show();
+                  }
 
 
                 } catch (JSONException e) {
@@ -742,6 +759,7 @@ public class AccountActivity extends AppCompatActivity implements CountryAdapter
                 String stateName = js.optString("stateName");
                 String countryName = js.optString("countryName");
                 String countryCode = js.optString("countryCode");
+                String stateShortName = js.optString("stateShortName");
                 act_phone.setText(phoneNumber);
                 et_street.setText(street);
                 et_postalcode.setText(postalCode);
@@ -750,7 +768,14 @@ public class AccountActivity extends AppCompatActivity implements CountryAdapter
                 tv_country_code.setText(countryId);
                 tv_state_code.setText(stateId);
                 et_country.setText(countryName);
-                et_state.setText(stateName);
+
+                if (stateShortName.isEmpty())
+                {
+                    et_state.setText(stateName);
+                }else {
+                    et_state.setText(stateShortName);
+                }
+
                 // act_Cphone.setText("+"+countryCode);
                 if (countryCode.contains("+")) {
                     act_Cphone.setText(countryCode);
