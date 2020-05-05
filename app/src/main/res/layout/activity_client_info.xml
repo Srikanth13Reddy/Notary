@@ -81,7 +81,7 @@
                         android:layout_height="wrap_content"/>
 
 
-                    <com.apptomate.notary.utils.MyListView
+                    <com.capostille.android.utils.MyListView
                         android:layout_marginTop="6dp"
                         android:id="@+id/lv_documents1"
                         android:dividerHeight="6dp"
@@ -99,7 +99,7 @@
                         android:layout_height="wrap_content"/>
 
 
-                    <com.apptomate.notary.utils.MyListView
+                    <com.capostille.android.utils.MyListView
                         android:layout_marginTop="6dp"
                         android:id="@+id/lv_documents"
                         android:layout_width="match_parent"

@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Notary</string>
+    <string name="app_name">Capostille</string>
     <string name="sign_in_with_email">Sign in with email</string>
     <string name="password">Password</string>
     <string name="forgot_password">Forgot Password ?</string>

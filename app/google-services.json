@@ -1,34 +1,42 @@
 {
   "project_info": {
-    "project_number": "629979726059",
-    "firebase_url": "https://notary-8ad19.firebaseio.com",
-    "project_id": "notary-8ad19",
-    "storage_bucket": "notary-8ad19.appspot.com"
+    "project_number": "495251244896",
+    "firebase_url": "https://capostille-3e690.firebaseio.com",
+    "project_id": "capostille-3e690",
+    "storage_bucket": "capostille-3e690.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:629979726059:android:370977ea32801b66d1feae",
+        "mobilesdk_app_id": "1:495251244896:android:39be71c02c60ba001c8005",
         "android_client_info": {
-          "package_name": "com.apptomate.notary"
+          "package_name": "com.capostille.android"
         }
       },
       "oauth_client": [
         {
-          "client_id": "629979726059-bvhjdkouhogeo9787ntmsen460a3cctn.apps.googleusercontent.com",
+          "client_id": "495251244896-supqdn40j0ov0mlre0mbltu6ubggmn5r.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.capostille.android",
+            "certificate_hash": "aa5b487e61a405a347e80c037268548ae65b6173"
+          }
+        },
+        {
+          "client_id": "495251244896-g4b23l0ems61aegbrdf24b82509vk19s.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyDQgS-Vww8HScLnJslMlFNVvnEixEYAmJY"
+          "current_key": "AIzaSyCqHOR-vaf5MSI3TqAS0M4jsaXFTR_28gQ"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "629979726059-bvhjdkouhogeo9787ntmsen460a3cctn.apps.googleusercontent.com",
+              "client_id": "495251244896-g4b23l0ems61aegbrdf24b82509vk19s.apps.googleusercontent.com",
               "client_type": 3
             }
           ]
